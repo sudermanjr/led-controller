@@ -31,6 +31,6 @@ clean:
 	rm -f $(BINARY_NAME)
 	rm -f pi-builder/init-decrypted
 flash:
-	sops -d pi-builder/cloud-init.yaml > pi-builder/init-decrypted
+	sops -d pi-builder/cloud-init.yaml | yq r - data > pi-builder/init-decrypted
 	flash --bootconf pi-builder/no-uart-config.txt --userdata pi-builder/init-decrypted $(HYPRIOT_IMAGE)
 	rm pi-builder/init-decrypted
