@@ -21,9 +21,17 @@ import (
 )
 
 const (
-	brightness = 90
-	ledCounts  = 64
-	sleepTime  = 50
+	brightness = 100
+	ledCounts  = 12
+	sleepTime  = 20
+	blue       = 0x0000ff
+	green      = 0x00ff00
+	yellow     = 0xffaf33
+	purple     = 0xaf33ff
+	red        = 0xff0000
+	teal       = 0x33ffd1
+	pink       = 0xff08c7
+	off        = 0x000000
 )
 
 type wsEngine interface {
@@ -73,9 +81,14 @@ func main() {
 	checkError(cw.setup())
 	defer dev.Fini()
 
-	_ = cw.display(uint32(0x0000ff))
-	_ = cw.display(uint32(0x00ff00))
-	_ = cw.display(uint32(0xff0000))
-	_ = cw.display(uint32(0x000000))
-
+	for i := 1; i < 10; i++ {
+		_ = cw.display(uint32(blue))
+		_ = cw.display(uint32(green))
+		_ = cw.display(uint32(yellow))
+		_ = cw.display(uint32(purple))
+		_ = cw.display(uint32(red))
+		_ = cw.display(uint32(teal))
+		_ = cw.display(uint32(pink))
+		_ = cw.display(uint32(off))
+	}
 }
