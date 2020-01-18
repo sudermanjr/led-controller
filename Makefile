@@ -34,3 +34,7 @@ flash:
 	sops -d pi-builder/cloud-init.yaml | yq r - data > pi-builder/init-decrypted
 	flash --bootconf pi-builder/no-uart-config.txt --userdata pi-builder/init-decrypted $(HYPRIOT_IMAGE)
 	rm pi-builder/init-decrypted
+encrypt-init:
+	sops --encrypt pi-builder/init-decrypted > pi-builder/cloud-init.yaml
+decrypt-init:
+	sops -d pi-builder/cloud-init.yaml | yq r - data > pi-builder/init-decrypted
