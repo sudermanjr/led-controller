@@ -73,9 +73,9 @@ func main() {
 	checkError(cw.setup())
 	defer dev.Fini()
 
-	cw.display(uint32(0x0000ff))
-	cw.display(uint32(0x00ff00))
-	cw.display(uint32(0xff0000))
-	cw.display(uint32(0x000000))
+	_ = cw.display(uint32(0x0000ff))
+	_ = cw.display(uint32(0x00ff00))
+	_ = cw.display(uint32(0xff0000))
+	_ = cw.display(uint32(0x000000))
 
 }

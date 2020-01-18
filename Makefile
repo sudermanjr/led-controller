@@ -7,6 +7,7 @@ BINARY_NAME=led-controller
 COMMIT := $(shell git rev-parse HEAD)
 VERSION := "dev"
 PWD = $(shell pwd)
+HYPRIOT_IMAGE="https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip"
 
 all: lint test create-builder build
 build:
@@ -28,3 +29,8 @@ clean:
 	$(GOCLEAN)
 	$(GOCMD) fmt ./...
 	rm -f $(BINARY_NAME)
+	rm -f pi-builder/init-decrypted
+flash:
+	sops -d pi-builder/cloud-init.yaml > pi-builder/init-decrypted
+	flash --bootconf pi-builder/no-uart-config.txt --userdata pi-builder/init-decrypted $(HYPRIOT_IMAGE)
+	rm pi-builder/init-decrypted
