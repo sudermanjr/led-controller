@@ -2,3 +2,4 @@
 init-decrypted
 coverage.txt
 *-report.out
+.tmp

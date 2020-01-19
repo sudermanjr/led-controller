@@ -59,7 +59,7 @@ func newLEDArray() (*LEDArray, error) {
 	}
 	// Start off
 	led.brightness = minBrightness
-	led.color = off
+	led.color = colors["white"]
 	return led, nil
 }
 

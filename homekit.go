@@ -49,13 +49,13 @@ func startHomekit() {
 	ac.Lightbulb.On.OnValueRemoteUpdate(func(on bool) {
 		if on {
 			klog.Infof("Switch is on")
-			err = led.fade(colors["white"], maxBrightness)
+			err = led.fade(led.color, maxBrightness)
 			if err != nil {
 				klog.Error(err)
 			}
 		} else {
 			klog.Infof("Switch is off")
-			err = led.fade(off, minBrightness)
+			err = led.fade(led.color, minBrightness)
 			if err != nil {
 				klog.Error(err)
 			}
@@ -80,7 +80,7 @@ func startHomekit() {
 
 	hc.OnTermination(func() {
 		klog.Info("terminated. turning off lights")
-		err = led.fade(off, minBrightness)
+		err = led.fade(led.color, minBrightness)
 		if err != nil {
 			klog.Error(err)
 		}

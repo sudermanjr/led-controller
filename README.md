@@ -12,6 +12,8 @@ This is cross-compiled for the Raspberry Pi using the instructions in the rpi-ws
 
 The build commands are in the [Makefile](Makefile). You can `make build` to build the Docker container and then use that to build the binary for the Pi. At the end it will show the output of `file led-controller` to verify the type of the binary.
 
+The build will also create a local `.tmp` directory for storing build cache so that subsequent builds are much much faster.
+
 Another word of caution: This container build will utilized your local GOPATH so that it doesn't have to download every package every time.
 
 ## References
