@@ -41,6 +41,6 @@ var offCmd = &cobra.Command{
 		}
 		defer led.ws.Fini()
 
-		_ = led.fade(off, 0)
+		_ = led.fade(off, minBrightness)
 	},
 }

@@ -58,7 +58,7 @@ func newLEDArray() (*LEDArray, error) {
 		return nil, err
 	}
 	// Start off
-	led.brightness = 0
+	led.brightness = minBrightness
 	led.color = off
 	return led, nil
 }
@@ -143,13 +143,13 @@ func (led *LEDArray) fade(color uint32, target int) error {
 // stepRamp returns a list of steps in a brightness ramp up
 func stepRamp(start float64, stop float64, duration float64) []int {
 	slope := (stop - start) / duration
-	klog.V(10).Infof("slope of ramp: %f", slope)
+	klog.V(7).Infof("slope of ramp: %f", slope)
 
 	var ramp []int
 	for i := 0; i < int(duration); i++ {
 		point := start + (slope * float64(i))
 		ramp = append(ramp, int(point))
 	}
-	klog.V(10).Infof("calculated ramp: %v", ramp)
+	klog.V(7).Infof("calculated ramp: %v", ramp)
 	return ramp
 }

@@ -28,8 +28,8 @@ func init() {
 	// Flags
 	rootCmd.PersistentFlags().IntVarP(&ledCount, "led-count", "l", 12, "The number of LEDs in the array.")
 	rootCmd.PersistentFlags().IntVar(&maxBrightness, "max-brightness", 200, "The maximum brightness that will work within the 0-250 range.")
-	rootCmd.PersistentFlags().IntVar(&minBrightness, "min-brightness", 30, "The minimum brightness that will work within the 0-250 range.")
-	rootCmd.PersistentFlags().IntVarP(&fadeDuration, "fade-duration", "f", 30, "The duration of fade-ins and fade-outs in ms.")
+	rootCmd.PersistentFlags().IntVar(&minBrightness, "min-brightness", 25, "The minimum brightness that will work within the 0-250 range.")
+	rootCmd.PersistentFlags().IntVarP(&fadeDuration, "fade-duration", "f", 100, "The duration of fade-ins and fade-outs in ms.")
 
 	//Commands
 	rootCmd.AddCommand(versionCmd)
