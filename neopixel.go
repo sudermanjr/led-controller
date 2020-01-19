@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math"
 	"time"
 
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
@@ -32,7 +31,9 @@ type wsEngine interface {
 
 // LEDArray is a struct for interacting with LEDs
 type LEDArray struct {
-	ws wsEngine
+	ws         wsEngine
+	brightness int
+	color      uint32
 }
 
 func newLEDArray() (*LEDArray, error) {
@@ -46,7 +47,7 @@ func newLEDArray() (*LEDArray, error) {
 		return nil, err
 	}
 
-	cw := &LEDArray{
+	led := &LEDArray{
 		ws: dev,
 	}
 
@@ -55,7 +56,10 @@ func newLEDArray() (*LEDArray, error) {
 		klog.Error(err)
 		return nil, err
 	}
-	return cw, nil
+	// Start off
+	led.brightness = 0
+	led.color = off
+	return led, nil
 }
 
 // display changes all of the LEDs one at a time
@@ -74,23 +78,47 @@ func (led *LEDArray) display(color uint32, delay int, brightness int) error {
 	return nil
 }
 
+// setBrightness turns the LED array to a brightness value
+// and sets the led.brightness value accordingly
+// if it goes out of bounds, it will be set to min or max
+func (led *LEDArray) setBrightness(value int) error {
+
+	value = brightnessBounds(value)
+	led.ws.SetBrightness(0, value)
+	err := led.ws.Render()
+	if err != nil {
+		return err
+	}
+	led.brightness = value
+	return nil
+}
+
+// brightnessBounds checks to see if the value is
+// inside the min/max bounds. If it is out, return
+// the appropriate min or max
+func brightnessBounds(value int) int {
+	// Check the bounds
+	klog.V(10).Infof("comparing value %d to min: %d, max: %d", value, minBrightness, maxBrightness)
+	if value < minBrightness {
+		return minBrightness
+	} else if value > maxBrightness {
+		return maxBrightness
+	}
+	return value
+}
+
 // fade goes to a new brightness in the duration specified
-func (led *LEDArray) fade(color uint32, start int, target int, duration int) error {
+func (led *LEDArray) fade(color uint32, target int) error {
 
-	// Number of steps of brightness to go per millisecond
-	stepSize := math.Abs(float64((target - start) / duration))
-
-	ramp := stepRamp(float64(duration), stepSize)
+	ramp := stepRamp(float64(led.brightness), float64(target), float64(fadeDuration))
 
 	//Set the color on all the LEDs
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
 		led.ws.Leds(0)[i] = color
 	}
 
-	//Fade in
 	for _, step := range ramp {
-		led.ws.SetBrightness(0, step)
-		err := led.ws.Render()
+		err := led.setBrightness(step)
 		if err != nil {
 			return err
 		}
@@ -100,12 +128,13 @@ func (led *LEDArray) fade(color uint32, start int, target int, duration int) err
 }
 
 // stepRamp returns a list of steps in a brightness ramp up
-func stepRamp(steps float64, size float64) []int {
+func stepRamp(start float64, stop float64, duration float64) []int {
+	slope := (stop - start) / duration
+
 	var ramp []int
-	step := 0
-	for i := 0; i < int(steps); i++ {
-		ramp = append(ramp, step)
-		step = step + int(size)
+	for i := 0; i < int(duration); i++ {
+		point := start + (slope * float64(i))
+		ramp = append(ramp, int(point))
 	}
 	return ramp
 }

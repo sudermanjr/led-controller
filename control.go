@@ -11,7 +11,7 @@ func init() {
 	rootCmd.AddCommand(onCmd)
 	rootCmd.AddCommand(offCmd)
 	onCmd.Flags().StringVarP(&colorName, "color", "c", "white", "The color to turn the lights on to.")
-	onCmd.Flags().IntVar(&onBrightness, "brightness", 100, "The brightness setting. Range is 1-250.")
+	onCmd.Flags().IntVar(&onBrightness, "brightness", 100, "The brightness setting. Range is between the min-brightness and max-brightness.")
 
 }
 
@@ -26,7 +26,7 @@ var onCmd = &cobra.Command{
 		}
 		defer led.ws.Fini()
 
-		_ = led.fade(colors[colorName], 0, onBrightness, 10)
+		_ = led.display(colors[colorName], 0, onBrightness)
 	},
 }
 

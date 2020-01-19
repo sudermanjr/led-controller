@@ -49,7 +49,7 @@ func startHomekit() {
 	ac.Lightbulb.On.OnValueRemoteUpdate(func(on bool) {
 		if on {
 			klog.Infof("Switch is on")
-			err = led.fade(colors["white"], 0, 150, 20)
+			err = led.fade(colors["white"], 150)
 			if err != nil {
 				klog.Error(err)
 			}
@@ -63,15 +63,19 @@ func startHomekit() {
 	})
 
 	ac.Lightbulb.Hue.OnValueRemoteUpdate(func(value float64) {
-		klog.Infof("hue set to: %f", value)
+		klog.Infof("homekit hue set to: %f", value)
 	})
 
 	ac.Lightbulb.Saturation.OnValueRemoteUpdate(func(value float64) {
-		klog.Infof("saturation set to %f", value)
+		klog.Infof("homekit saturation set to %f", value)
 	})
 
 	ac.Lightbulb.Brightness.OnValueRemoteUpdate(func(value int) {
-		klog.Infof("brightness set to: %d", value)
+		klog.Infof("homekit brightness set to: %d", value)
+		err = led.fade(colors["white"], scaleHomekitBrightness(value))
+		if err != nil {
+			klog.Error(err)
+		}
 	})
 
 	hc.OnTermination(func() {
@@ -84,4 +88,19 @@ func startHomekit() {
 	})
 
 	t.Start()
+}
+
+// scaleHomekitBrightness converts a 0-100 homekit brightness
+// to the scale of the controller (min - max)
+// math isn't as easy as it used to be for me:
+// https://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
+func scaleHomekitBrightness(value int) int {
+	min := 0
+	max := 100
+	a := minBrightness
+	b := maxBrightness
+
+	new := ((b-a)*(value-min))/(max-min) + a
+
+	return new
 }

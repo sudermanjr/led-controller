@@ -5,11 +5,18 @@ import (
 	"k8s.io/klog"
 )
 
+var (
+	demoBrightness int
+	demoDelay      int
+	demoCount      int
+)
+
 func init() {
 	rootCmd.AddCommand(demoCmd)
 
-	demoCmd.Flags().IntVar(&demoDelay, "speed", 100, "The delay in ms of the demo program.")
+	demoCmd.Flags().IntVar(&demoDelay, "delay", 100, "The delay in ms of the demo program.")
 	demoCmd.Flags().IntVar(&demoCount, "count", 1, "The number of loops to run the demo.")
+	demoCmd.Flags().IntVar(&demoBrightness, "brightness", 150, "The brightness to run the demo at. Must be between min and max.")
 }
 
 var demoCmd = &cobra.Command{
