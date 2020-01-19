@@ -15,14 +15,16 @@ func main() {
 }
 
 var (
-	version = "development"
-	commit  = "n/a"
-	pin     int
+	version    = "development"
+	commit     = "n/a"
+	ledCount   int
+	brightness int
 )
 
 func init() {
 	// Flags
-	rootCmd.PersistentFlags().IntVar(&pin, "pin", 18, "The GPIO pin of the LEDs")
+	rootCmd.PersistentFlags().IntVar(&ledCount, "led-count", 12, "The number of LEDs in the array.")
+	rootCmd.PersistentFlags().IntVar(&brightness, "brightness", 100, "The brightnes to run the LEDs at.")
 
 	//Commands
 	rootCmd.AddCommand(demo)
@@ -33,7 +35,7 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 
 	environmentVariables := map[string]string{
-		"LED_GPIO_PIN": "pin",
+		"LED_COUNT": "led-count",
 	}
 
 	for env, flag := range environmentVariables {

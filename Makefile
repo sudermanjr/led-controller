@@ -5,14 +5,14 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 BINARY_NAME=led-controller
 COMMIT := $(shell git rev-parse HEAD)
-VERSION := "dev"
+VERSION=dev
 HYPRIOT_IMAGE="https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip"
 PKG_PATH=/go/src/github.com/sudermanjr/led-controller
-
+LDFLAGS=\"-X main.version=$(VERSION) -X main.commit=$(COMMIT) -s -w\"
 all: lint test create-builder build
 build: create-builder build-arm
 build-arm:
-	docker run --rm -ti -v ${GOPATH}:/go -w $(PKG_PATH) rpi-ws281x-go-builder /usr/bin/qemu-arm-static /bin/sh -c "$(GOCMD) build -o $(PKG_PATH)/$(BINARY_NAME) -v"
+	docker run --rm -ti -v ${GOPATH}:/go -w $(PKG_PATH) rpi-ws281x-go-builder /usr/bin/qemu-arm-static /bin/sh -c "$(GOCMD) build -ldflags $(LDFLAGS) -o $(PKG_PATH)/$(BINARY_NAME) -v"
 	file led-controller
 create-builder:
 	docker build --tag rpi-ws281x-go-builder .
