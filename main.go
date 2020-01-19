@@ -21,7 +21,7 @@ var (
 	brightness int
 	demoDelay  int
 	demoCount  int
-	color      string
+	colorName  string
 )
 
 func init() {
@@ -30,16 +30,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&brightness, "brightness", 100, "The brightnes to run the LEDs at.")
 
 	//Commands
-	rootCmd.AddCommand(demoCmd)
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(onCmd)
-
-	// Demo Flags
-	demoCmd.Flags().IntVar(&demoDelay, "speed", 100, "The delay in ms of the demo program.")
-	demoCmd.Flags().IntVar(&demoCount, "count", 1, "The number of loops to run the demo.")
-
-	// On Flags
-	onCmd.Flags().StringVarP(&color, "color", "c", "white", "The color to turn the lights on to.")
 
 	klog.InitFlags(nil)
 	flag.Parse()
@@ -72,24 +63,6 @@ var rootCmd = &cobra.Command{
 			klog.Error(err)
 		}
 		os.Exit(1)
-	},
-}
-
-var demoCmd = &cobra.Command{
-	Use:   "demo",
-	Short: "Run a demo.",
-	Long:  `Runs a demo.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		Demo()
-	},
-}
-
-var onCmd = &cobra.Command{
-	Use:   "on",
-	Short: "Turn on the lights.",
-	Long:  `Turns on the lights to a specific color.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		On(color)
 	},
 }
 

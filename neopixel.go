@@ -32,31 +32,20 @@ func checkError(err error) {
 }
 
 type colorWipe struct {
-	ws    wsEngine
-	delay int
+	ws wsEngine
 }
 
 func (cw *colorWipe) setup() error {
 	return cw.ws.Init()
 }
 
-func (cw *colorWipe) display(color uint32) error {
+func (cw *colorWipe) display(color uint32, delay int) error {
 	for i := 0; i < len(cw.ws.Leds(0)); i++ {
 		cw.ws.Leds(0)[i] = color
 		if err := cw.ws.Render(); err != nil {
 			return err
 		}
-		time.Sleep(time.Duration(cw.delay) * time.Millisecond)
-	}
-	return nil
-}
-
-func (cw *colorWipe) on(color uint32) error {
-	for i := 0; i < len(cw.ws.Leds(0)); i++ {
-		cw.ws.Leds(0)[i] = color
-		if err := cw.ws.Render(); err != nil {
-			return err
-		}
+		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 	return nil
 }
