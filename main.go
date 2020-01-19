@@ -29,7 +29,6 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&ledCount, "led-count", "l", 12, "The number of LEDs in the array.")
 	rootCmd.PersistentFlags().IntVar(&maxBrightness, "max-brightness", 200, "The maximum brightness that will work within the 0-250 range.")
 	rootCmd.PersistentFlags().IntVar(&minBrightness, "min-brightness", 30, "The minimum brightness that will work within the 0-250 range.")
-
 	rootCmd.PersistentFlags().IntVarP(&fadeDuration, "fade-duration", "f", 30, "The duration of fade-ins and fade-outs in ms.")
 
 	//Commands
@@ -40,7 +39,10 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 
 	environmentVariables := map[string]string{
-		"LED_COUNT": "led-count",
+		"LED_COUNT":      "led-count",
+		"MAX_BRIGHTNESS": "max-brightness",
+		"MIN_BRIGHTNESS": "min-brightness",
+		"FADE_DURTION":   "fade-duration",
 	}
 
 	for env, flag := range environmentVariables {

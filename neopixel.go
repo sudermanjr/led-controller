@@ -53,6 +53,7 @@ func newLEDArray() (*LEDArray, error) {
 
 	err = dev.Init()
 	if err != nil {
+		klog.Error("could not initialize array, did you run as root?")
 		klog.Error(err)
 		return nil, err
 	}
@@ -66,9 +67,11 @@ func newLEDArray() (*LEDArray, error) {
 // delay: sets the time between each LED coming on
 // brightness: sets the brightness for the entire thing
 func (led *LEDArray) display(color uint32, delay int, brightness int) error {
+	klog.V(6).Infof("setting led array to color: %d, delay: %d, brightness: %d", color, delay, brightness)
 	led.ws.SetBrightness(0, brightness)
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
 		led.ws.Leds(0)[i] = color
+		klog.V(10).Infof("setting led %d", i)
 		if err := led.ws.Render(); err != nil {
 			klog.Error(err)
 			return err
@@ -82,14 +85,15 @@ func (led *LEDArray) display(color uint32, delay int, brightness int) error {
 // and sets the led.brightness value accordingly
 // if it goes out of bounds, it will be set to min or max
 func (led *LEDArray) setBrightness(value int) error {
-
 	value = brightnessBounds(value)
+	klog.V(8).Infof("setting brightness to %d", value)
 	led.ws.SetBrightness(0, value)
 	err := led.ws.Render()
 	if err != nil {
 		return err
 	}
 	led.brightness = value
+	klog.V(10).Infof("storing brightness as %d", led.brightness)
 	return nil
 }
 
@@ -100,16 +104,21 @@ func brightnessBounds(value int) int {
 	// Check the bounds
 	klog.V(10).Infof("comparing value %d to min: %d, max: %d", value, minBrightness, maxBrightness)
 	if value < minBrightness {
+		klog.V(8).Infof("brightness %d below bounds, setting to %d", value, minBrightness)
 		return minBrightness
 	} else if value > maxBrightness {
+		klog.V(8).Infof("brightness %d above bounds, setting to %d", value, maxBrightness)
 		return maxBrightness
 	}
+	klog.V(8).Infof("not out of bounds. returning %d", value)
 	return value
 }
 
 // fade goes to a new brightness in the duration specified
 func (led *LEDArray) fade(color uint32, target int) error {
 
+	klog.V(8).Infof("fading brightness to %d", target)
+	klog.V(8).Infof("setting color to %d", color)
 	ramp := stepRamp(float64(led.brightness), float64(target), float64(fadeDuration))
 
 	//Set the color on all the LEDs
@@ -118,6 +127,7 @@ func (led *LEDArray) fade(color uint32, target int) error {
 	}
 
 	for _, step := range ramp {
+		klog.V(10).Infof("processing step: %d", step)
 		err := led.setBrightness(step)
 		if err != nil {
 			return err
@@ -130,11 +140,13 @@ func (led *LEDArray) fade(color uint32, target int) error {
 // stepRamp returns a list of steps in a brightness ramp up
 func stepRamp(start float64, stop float64, duration float64) []int {
 	slope := (stop - start) / duration
+	klog.V(10).Infof("slope of ramp: %f", slope)
 
 	var ramp []int
 	for i := 0; i < int(duration); i++ {
 		point := start + (slope * float64(i))
 		ramp = append(ramp, int(point))
 	}
+	klog.V(10).Infof("calculated ramp: %v", ramp)
 	return ramp
 }

@@ -87,6 +87,11 @@ func startHomekit() {
 		<-t.Stop()
 	})
 
+	klog.Info("starting homekit server...")
+	klog.Infof("max-brightness: %d", maxBrightness)
+	klog.Infof("min-brightness: %d", minBrightness)
+	klog.Infof("fade-duration %d", fadeDuration)
+
 	t.Start()
 }
 
