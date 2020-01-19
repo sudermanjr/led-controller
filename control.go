@@ -2,11 +2,10 @@ package main
 
 import (
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
-	"k8s.io/klog"
 )
 
-// Demo runs a demo of the lights
-func Demo() {
+// On turns on the lights
+func On(colorName string) {
 	opt := ws2811.DefaultOptions
 
 	opt.Channels[0].Brightness = brightness
@@ -16,18 +15,10 @@ func Demo() {
 	checkError(err)
 
 	cw := &colorWipe{
-		ws:    dev,
-		delay: demoDelay,
+		ws: dev,
 	}
 	checkError(cw.setup())
 	defer dev.Fini()
 
-	for i := 1; i < (demoCount + 1); i++ {
-		for colorName, color := range colors {
-			klog.Infof("displaying: %s", colorName)
-			_ = cw.display(color)
-		}
-	}
-
-	_ = cw.display(off)
+	_ = cw.on(colors[colorName])
 }
