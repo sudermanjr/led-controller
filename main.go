@@ -35,8 +35,8 @@ func init() {
 	rootCmd.AddCommand(onCmd)
 
 	// Demo Flags
-	demoCmd.Flags().IntVar(&demoDelay, "speed", 200, "The delay in ms of the demo program.")
-	demoCmd.Flags().IntVar(&demoCount, "count", 2, "The number of loops to run the demo.")
+	demoCmd.Flags().IntVar(&demoDelay, "speed", 100, "The delay in ms of the demo program.")
+	demoCmd.Flags().IntVar(&demoCount, "count", 1, "The number of loops to run the demo.")
 
 	// On Flags
 	onCmd.Flags().StringVarP(&color, "color", "c", "white", "The color to turn the lights on to.")
