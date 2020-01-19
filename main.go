@@ -32,14 +32,14 @@ func init() {
 	//Commands
 	rootCmd.AddCommand(demoCmd)
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(on)
+	rootCmd.AddCommand(onCmd)
 
 	// Demo Flags
 	demoCmd.Flags().IntVar(&demoDelay, "speed", 200, "The delay in ms of the demo program.")
 	demoCmd.Flags().IntVar(&demoCount, "count", 2, "The number of loops to run the demo.")
 
 	// On Flags
-	on.Flags().StringVarP(&color, "color", "c", "white", "The color to turn the lights on to.")
+	onCmd.Flags().StringVarP(&color, "color", "c", "white", "The color to turn the lights on to.")
 
 	klog.InitFlags(nil)
 	flag.Parse()
@@ -84,7 +84,7 @@ var demoCmd = &cobra.Command{
 	},
 }
 
-var on = &cobra.Command{
+var onCmd = &cobra.Command{
 	Use:   "on",
 	Short: "Turn on the lights.",
 	Long:  `Turns on the lights to a specific color.`,
