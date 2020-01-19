@@ -1,14 +1,17 @@
 package main
 
 import (
-	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
 	"github.com/spf13/cobra"
+	"k8s.io/klog"
 )
+
+var onBrightness int
 
 func init() {
 	rootCmd.AddCommand(onCmd)
 	rootCmd.AddCommand(offCmd)
 	onCmd.Flags().StringVarP(&colorName, "color", "c", "white", "The color to turn the lights on to.")
+	onCmd.Flags().IntVar(&onBrightness, "brightness", 100, "The brightness setting. Range is 1-250.")
 
 }
 
@@ -17,21 +20,13 @@ var onCmd = &cobra.Command{
 	Short: "Turn on the lights.",
 	Long:  `Turns on the lights to a specific color.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		opt := ws2811.DefaultOptions
-
-		opt.Channels[0].Brightness = brightness
-		opt.Channels[0].LedCount = ledCount
-
-		dev, err := ws2811.MakeWS2811(&opt)
-		checkError(err)
-
-		cw := &colorWipe{
-			ws: dev,
+		led, err := newLEDArray()
+		if err != nil {
+			klog.Fatal(err)
 		}
-		checkError(cw.setup())
-		defer dev.Fini()
+		defer led.ws.Fini()
 
-		_ = cw.display(colors[colorName], 0)
+		_ = led.fade(colors[colorName], onBrightness, 0, 10)
 	},
 }
 
@@ -40,20 +35,12 @@ var offCmd = &cobra.Command{
 	Short: "Turn off the lights.",
 	Long:  `Turns off the lights.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		opt := ws2811.DefaultOptions
-
-		opt.Channels[0].Brightness = brightness
-		opt.Channels[0].LedCount = ledCount
-
-		dev, err := ws2811.MakeWS2811(&opt)
-		checkError(err)
-
-		cw := &colorWipe{
-			ws: dev,
+		led, err := newLEDArray()
+		if err != nil {
+			klog.Fatal(err)
 		}
-		checkError(cw.setup())
-		defer dev.Fini()
+		defer led.ws.Fini()
 
-		_ = cw.display(off, 0)
+		_ = led.fade(off, 0, 0, 10)
 	},
 }

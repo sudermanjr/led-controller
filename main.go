@@ -15,19 +15,19 @@ func main() {
 }
 
 var (
-	version    = "development"
-	commit     = "n/a"
-	ledCount   int
-	brightness int
-	demoDelay  int
-	demoCount  int
-	colorName  string
+	version       = "development"
+	commit        = "n/a"
+	ledCount      int
+	maxBrightness int
+	demoDelay     int
+	demoCount     int
+	colorName     string
 )
 
 func init() {
 	// Flags
-	rootCmd.PersistentFlags().IntVar(&ledCount, "led-count", 12, "The number of LEDs in the array.")
-	rootCmd.PersistentFlags().IntVar(&brightness, "brightness", 100, "The brightnes to run the LEDs at.")
+	rootCmd.PersistentFlags().IntVarP(&ledCount, "led-count", "l", 12, "The number of LEDs in the array.")
+	rootCmd.PersistentFlags().IntVarP(&maxBrightness, "max-brightness", "b", 100, "The brightnes to run the LEDs at.")
 
 	//Commands
 	rootCmd.AddCommand(versionCmd)
