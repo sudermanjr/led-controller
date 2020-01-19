@@ -68,7 +68,10 @@ func newLEDArray() (*LEDArray, error) {
 // brightness: sets the brightness for the entire thing
 func (led *LEDArray) display(color uint32, delay int, brightness int) error {
 	klog.V(6).Infof("setting led array to color: %d, delay: %d, brightness: %d", color, delay, brightness)
-	led.ws.SetBrightness(0, brightness)
+	err := led.setBrightness(brightness)
+	if err != nil {
+		return err
+	}
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
 		led.ws.Leds(0)[i] = color
 		klog.V(10).Infof("setting led %d", i)

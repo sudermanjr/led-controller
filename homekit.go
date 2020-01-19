@@ -55,7 +55,7 @@ func startHomekit() {
 			}
 		} else {
 			klog.Infof("Switch is off")
-			err = led.display(off, 0, 0)
+			err = led.fade(off, 0)
 			if err != nil {
 				klog.Error(err)
 			}
@@ -80,7 +80,7 @@ func startHomekit() {
 
 	hc.OnTermination(func() {
 		klog.Info("terminated. turning off lights")
-		err = led.display(off, 0, 0)
+		err = led.fade(off, 0)
 		if err != nil {
 			klog.Error(err)
 		}
