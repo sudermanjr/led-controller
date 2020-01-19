@@ -1,4 +1,4 @@
-package neopixel
+package main
 
 import (
 	"time"

@@ -1,6 +1,7 @@
 FROM balenalib/raspberry-pi-golang:1.12-build AS builder
 RUN [ "cross-build-start" ]
 WORKDIR /tmp
+ENV GO111MODULE=on
 RUN apt-get update -y && apt-get install -y scons
 RUN git clone https://github.com/jgarff/rpi_ws281x.git && \
   cd rpi_ws281x && \
@@ -9,8 +10,7 @@ RUN [ "cross-build-end" ]
 
 FROM balenalib/raspberry-pi-golang:1.12
 RUN [ "cross-build-start" ]
+ENV GO111MODULE=on
 COPY --from=builder /tmp/rpi_ws281x/*.a /usr/local/lib/
 COPY --from=builder /tmp/rpi_ws281x/*.h /usr/local/include/
-RUN go get -v -u github.com/rpi-ws281x/rpi-ws281x-go
-ENV GO111MODULE=on
 RUN [ "cross-build-end" ]
