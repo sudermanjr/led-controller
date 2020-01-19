@@ -26,7 +26,7 @@ var onCmd = &cobra.Command{
 		}
 		defer led.ws.Fini()
 
-		_ = led.fade(colors[colorName], onBrightness, 0, 10)
+		_ = led.fade(colors[colorName], 0, onBrightness, 10)
 	},
 }
 
@@ -41,6 +41,6 @@ var offCmd = &cobra.Command{
 		}
 		defer led.ws.Fini()
 
-		_ = led.fade(off, 0, 0, 10)
+		_ = led.display(off, 0, 0)
 	},
 }

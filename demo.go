@@ -27,10 +27,10 @@ var demoCmd = &cobra.Command{
 		for i := 1; i < (demoCount + 1); i++ {
 			for colorName, color := range colors {
 				klog.Infof("displaying: %s", colorName)
-				_ = led.fade(color, 100, demoDelay, 2)
+				_ = led.display(color, demoDelay, 150)
 			}
 		}
 
-		_ = led.display(off, 0)
+		_ = led.display(off, 0, 0)
 	},
 }

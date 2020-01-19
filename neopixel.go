@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"time"
 
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
@@ -57,7 +58,11 @@ func newLEDArray() (*LEDArray, error) {
 	return cw, nil
 }
 
-func (led *LEDArray) display(color uint32, delay int) error {
+// display changes all of the LEDs one at a time
+// delay: sets the time between each LED coming on
+// brightness: sets the brightness for the entire thing
+func (led *LEDArray) display(color uint32, delay int, brightness int) error {
+	led.ws.SetBrightness(0, brightness)
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
 		led.ws.Leds(0)[i] = color
 		if err := led.ws.Render(); err != nil {
@@ -69,16 +74,38 @@ func (led *LEDArray) display(color uint32, delay int) error {
 	return nil
 }
 
-func (led *LEDArray) fade(color uint32, brightness int, ledDelay int, brightnessDelay int) error {
-	for b := 0; b < brightness; b++ {
-		led.ws.SetBrightness(0, b)
-		time.Sleep(time.Duration(brightnessDelay) * time.Millisecond)
+// fade goes to a new brightness in the duration specified
+func (led *LEDArray) fade(color uint32, start int, target int, duration int) error {
 
-		err := led.display(color, ledDelay)
+	// Number of steps of brightness to go per millisecond
+	stepSize := math.Abs(float64((target - start) / duration))
+
+	ramp := stepRamp(float64(duration), stepSize)
+
+	//Set the color on all the LEDs
+	for i := 0; i < len(led.ws.Leds(0)); i++ {
+		led.ws.Leds(0)[i] = color
+	}
+
+	//Fade in
+	for _, step := range ramp {
+		led.ws.SetBrightness(0, step)
+		err := led.ws.Render()
 		if err != nil {
-			klog.Error(err)
 			return err
 		}
+		time.Sleep(time.Millisecond)
 	}
 	return nil
+}
+
+// stepRamp returns a list of steps in a brightness ramp up
+func stepRamp(steps float64, size float64) []int {
+	var ramp []int
+	step := 0
+	for i := 0; i < int(steps); i++ {
+		ramp = append(ramp, step)
+		step = step + int(size)
+	}
+	return ramp
 }
