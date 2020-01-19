@@ -15,18 +15,22 @@ func Demo() {
 	checkError(err)
 
 	cw := &colorWipe{
-		ws: dev,
+		ws:    dev,
+		delay: demoDelay,
 	}
 	checkError(cw.setup())
 	defer dev.Fini()
 
-	_ = cw.display(blue)
-	_ = cw.display(green)
-	_ = cw.display(yellow)
-	_ = cw.display(purple)
-	_ = cw.display(red)
-	_ = cw.display(teal)
-	_ = cw.display(pink)
-	_ = cw.display(white)
+	for i := 1; i < demoCount; i++ {
+		_ = cw.display(blue)
+		_ = cw.display(green)
+		_ = cw.display(yellow)
+		_ = cw.display(purple)
+		_ = cw.display(red)
+		_ = cw.display(teal)
+		_ = cw.display(pink)
+		_ = cw.display(white)
+	}
+
 	_ = cw.display(off)
 }

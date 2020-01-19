@@ -19,6 +19,8 @@ var (
 	commit     = "n/a"
 	ledCount   int
 	brightness int
+	demoDelay  int
+	demoCount  int
 )
 
 func init() {
@@ -29,6 +31,9 @@ func init() {
 	//Commands
 	rootCmd.AddCommand(demo)
 	rootCmd.AddCommand(versionCmd)
+
+	demo.Flags().IntVar(&demoDelay, "speed", 200, "The delay in ms of the demo program.")
+	demo.Flags().IntVar(&demoCount, "count", 2, "The number of loops to run the demo.")
 
 	klog.InitFlags(nil)
 	flag.Parse()

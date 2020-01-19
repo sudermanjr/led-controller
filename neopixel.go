@@ -5,16 +5,15 @@ import (
 )
 
 const (
-	sleepTime = 100
-	blue      = uint32(0x0000ff)
-	green     = uint32(0x00ff00)
-	yellow    = uint32(0xffaf33)
-	purple    = uint32(0xaf33ff)
-	red       = uint32(0xff0000)
-	teal      = uint32(0x33ffd1)
-	pink      = uint32(0xff08c7)
-	white     = uint32(0xffffff)
-	off       = uint32(0x000000)
+	blue   = uint32(0x0000ff)
+	green  = uint32(0x00ff00)
+	yellow = uint32(0xffaf33)
+	purple = uint32(0xaf33ff)
+	red    = uint32(0xff0000)
+	teal   = uint32(0x33ffd1)
+	pink   = uint32(0xff08c7)
+	white  = uint32(0xffffff)
+	off    = uint32(0x000000)
 )
 
 type wsEngine interface {
@@ -32,7 +31,8 @@ func checkError(err error) {
 }
 
 type colorWipe struct {
-	ws wsEngine
+	ws    wsEngine
+	delay int
 }
 
 func (cw *colorWipe) setup() error {
@@ -45,7 +45,7 @@ func (cw *colorWipe) display(color uint32) error {
 		if err := cw.ws.Render(); err != nil {
 			return err
 		}
-		time.Sleep(sleepTime * time.Millisecond)
+		time.Sleep(time.Duration(cw.delay) * time.Millisecond)
 	}
 	return nil
 }
