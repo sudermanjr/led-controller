@@ -19,6 +19,7 @@ jobs:
     executor: rok8s-scripts/ci-images
     steps:
       - checkout
+      - setup_remote_docker
       - run: make build
 
 workflows:
