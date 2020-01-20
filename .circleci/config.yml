@@ -20,7 +20,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: make build
+      - run: make build-circle
 
 workflows:
   version: 2
