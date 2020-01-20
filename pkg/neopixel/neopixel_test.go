@@ -1,4 +1,4 @@
-package main
+package neopixel
 
 import (
 	"testing"
@@ -17,11 +17,14 @@ func Test_brightnessBounds(t *testing.T) {
 		{name: "low", value: 10, want: 30},
 	}
 	for _, tt := range tests {
-		led := &ledArray{}
+		led := &LEDArray{
+			MinBrightness: 30,
+			MaxBrightness: 200,
+		}
 		t.Run(tt.name, func(t *testing.T) {
-			led.brightness = tt.value
+			led.Brightness = tt.value
 			led.checkBrightness()
-			assert.Equal(t, tt.want, led.brightness)
+			assert.Equal(t, tt.want, led.Brightness)
 		})
 	}
 }

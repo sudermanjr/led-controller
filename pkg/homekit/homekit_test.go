@@ -1,4 +1,4 @@
-package main
+package homekit
 
 import (
 	"testing"
@@ -7,6 +7,8 @@ import (
 )
 
 func Test_scaleHomekitBrightness(t *testing.T) {
+	minBrightness := 30
+	maxBrightness := 200
 	tests := []struct {
 		name  string
 		value int
@@ -19,7 +21,7 @@ func Test_scaleHomekitBrightness(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := scaleHomekitBrightness(tt.value)
+			got := scaleHomekitBrightness(tt.value, minBrightness, maxBrightness)
 			assert.Equal(t, tt.want, got)
 		})
 	}

@@ -1,31 +1,16 @@
-package main
+package homekit
 
 import (
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/spf13/cobra"
 	"k8s.io/klog"
+
+	"github.com/sudermanjr/led-controller/pkg/neopixel"
 )
 
-var homekitPin string
-
-func init() {
-	rootCmd.AddCommand(homekitCmd)
-
-	homekitCmd.Flags().StringVar(&homekitPin, "homekit-pin", "29847290", "The pin that homekit will use to authenticate with this device.")
-}
-
-var homekitCmd = &cobra.Command{
-	Use:   "homekit",
-	Short: "Run the lights as a homekit accessory.",
-	Long:  `Run the lights as a homekit accessory.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		startHomekit()
-	},
-}
-
-func startHomekit() {
+//Start starts the homekit server
+func Start(homekitPin string, led *neopixel.LEDArray) {
 	// create an accessory
 	info := accessory.Info{
 		Name:         "LED",
@@ -41,22 +26,16 @@ func startHomekit() {
 		klog.Fatal(err)
 	}
 
-	led, err := newledArray()
-	if err != nil {
-		klog.Fatal(err)
-	}
-	defer led.ws.Fini()
-
 	ac.Lightbulb.On.OnValueRemoteUpdate(func(on bool) {
 		if on {
 			klog.Infof("Switch is on")
-			err = led.fade(maxBrightness)
+			err = led.Fade(led.MaxBrightness)
 			if err != nil {
 				klog.Error(err)
 			}
 		} else {
 			klog.Infof("Switch is off")
-			err = led.fade(minBrightness)
+			err = led.Fade(led.MinBrightness)
 			if err != nil {
 				klog.Error(err)
 			}
@@ -65,8 +44,8 @@ func startHomekit() {
 
 	ac.Lightbulb.Hue.OnValueRemoteUpdate(func(value float64) {
 		klog.Infof("homekit hue set to: %f", value)
-		led.color = modifyHue(led.color, value)
-		err = led.display(0)
+		led.Color = modifyHue(led.Color, value)
+		err = led.Display(0)
 		if err != nil {
 			klog.Error(err)
 		}
@@ -74,8 +53,8 @@ func startHomekit() {
 
 	ac.Lightbulb.Saturation.OnValueRemoteUpdate(func(value float64) {
 		klog.Infof("homekit saturation set to %f", value)
-		led.color = modifySaturation(led.color, value)
-		err = led.display(0)
+		led.Color = modifySaturation(led.Color, value)
+		err = led.Display(0)
 		if err != nil {
 			klog.Error(err)
 		}
@@ -83,7 +62,7 @@ func startHomekit() {
 
 	ac.Lightbulb.Brightness.OnValueRemoteUpdate(func(value int) {
 		klog.Infof("homekit brightness set to: %d", value)
-		err = led.fade(scaleHomekitBrightness(value))
+		err = led.Fade(scaleHomekitBrightness(value, led.MinBrightness, led.MaxBrightness))
 		if err != nil {
 			klog.Error(err)
 		}
@@ -91,7 +70,7 @@ func startHomekit() {
 
 	hc.OnTermination(func() {
 		klog.Info("terminated. turning off lights")
-		err = led.fade(minBrightness)
+		err = led.Fade(led.MinBrightness)
 		if err != nil {
 			klog.Error(err)
 		}
@@ -99,9 +78,9 @@ func startHomekit() {
 	})
 
 	klog.Info("starting homekit server...")
-	klog.Infof("max-brightness: %d", maxBrightness)
-	klog.Infof("min-brightness: %d", minBrightness)
-	klog.Infof("fade-duration %d", fadeDuration)
+	klog.Infof("max-brightness: %d", led.MaxBrightness)
+	klog.Infof("min-brightness: %d", led.MinBrightness)
+	klog.Infof("fade-duration %d", led.FadeDuration)
 
 	t.Start()
 }
@@ -110,11 +89,11 @@ func startHomekit() {
 // to the scale of the controller (min - max)
 // math isn't as easy as it used to be for me:
 // https://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
-func scaleHomekitBrightness(value int) int {
+func scaleHomekitBrightness(value int, minArray int, maxArray int) int {
 	min := 0
 	max := 100
-	a := minBrightness
-	b := maxBrightness
+	a := minArray
+	b := maxArray
 
 	new := ((b-a)*(value-min))/(max-min) + a
 

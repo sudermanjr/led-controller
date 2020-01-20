@@ -1,10 +1,11 @@
-package main
+package cmd
 
 import (
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
+	"github.com/sudermanjr/led-controller/pkg/neopixel"
 )
 
 var onBrightness int
@@ -22,13 +23,13 @@ var onCmd = &cobra.Command{
 	Short: "Turn on the lights.",
 	Long:  `Turns on the lights to a specific color.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		led, err := newledArray()
+		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
 		if err != nil {
 			klog.Fatal(err)
 		}
-		defer led.ws.Fini()
-		led.color = color.HexToColor(colorMap[colorName])
-		_ = led.fade(onBrightness)
+		defer led.WS.Fini()
+		led.Color = color.HexToColor(color.ColorMap[colorName])
+		_ = led.Fade(onBrightness)
 	},
 }
 
@@ -37,11 +38,11 @@ var offCmd = &cobra.Command{
 	Short: "Turn off the lights.",
 	Long:  `Turns off the lights.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		led, err := newledArray()
+		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
 		if err != nil {
 			klog.Fatal(err)
 		}
-		defer led.ws.Fini()
-		_ = led.fade(minBrightness)
+		defer led.WS.Fini()
+		_ = led.Fade(minBrightness)
 	},
 }

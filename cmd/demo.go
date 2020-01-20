@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"time"
@@ -7,6 +7,7 @@ import (
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
+	"github.com/sudermanjr/led-controller/pkg/neopixel"
 )
 
 var (
@@ -46,34 +47,34 @@ var demoCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Initialize the LEDs
-		led, err := newledArray()
+		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
 		if err != nil {
 			klog.Fatal(err)
 		}
-		defer led.ws.Fini()
+		defer led.WS.Fini()
 
-		led.brightness = demoBrightness
+		led.Brightness = demoBrightness
 		// Loops through our list of pre-defined colors and display them in order.
 		for i := 0; i < (demoCount); i++ {
-			for colorName, colorValue := range colorMap {
+			for colorName, colorValue := range color.ColorMap {
 				klog.Infof("displaying: %s", colorName)
-				led.color = color.HexToColor(colorValue)
-				_ = led.display(demoDelay)
+				led.Color = color.HexToColor(colorValue)
+				_ = led.Display(demoDelay)
 			}
-			_ = led.fade(minBrightness)
+			_ = led.Fade(minBrightness)
 			time.Sleep(500 * time.Millisecond)
 
 			// Second part of demo - go through a color gradient really fast.
 			klog.V(3).Infof("starting color gradient")
 			colorList := color.GradientColorList(demoGradient, demoGradientLength)
 			for _, gradColor := range colorList {
-				led.color = gradColor
-				led.brightness = demoBrightness
-				_ = led.display(0)
+				led.Color = gradColor
+				led.Brightness = demoBrightness
+				_ = led.Display(0)
 				time.Sleep(time.Duration(demoDelay) * time.Nanosecond)
 			}
 		}
 
-		_ = led.fade(minBrightness)
+		_ = led.Fade(minBrightness)
 	},
 }

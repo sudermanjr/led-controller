@@ -12,6 +12,19 @@ import (
 	"k8s.io/klog"
 )
 
+//ColorMap is a map of named colors to hex values
+var ColorMap = map[string]string{
+	"blue":   "#0000ff",
+	"green":  "#00ff00",
+	"yellow": "#ffaf33",
+	"purple": "#af33ff",
+	"red":    "#ff0000",
+	"teal":   "#33ffd1",
+	"pink":   "#ff08c7",
+	"white":  "#ffffff",
+	"black":  "#000000", // This basically equates to off.
+}
+
 // GradientTable contains the "keypoints" of the colorgradient you want to generate.
 // The position of each keypoint has to live in the range [0,1]
 type GradientTable []struct {
