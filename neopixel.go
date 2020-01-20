@@ -16,9 +16,8 @@ var colors = map[string]uint32{
 	"teal":   uint32(0x33ffd1),
 	"pink":   uint32(0xff08c7),
 	"white":  uint32(0xffffff),
+	"black":  uint32(0x000000), // This basically equates to off.
 }
-
-const off = uint32(0x000000)
 
 type wsEngine interface {
 	Init() error
@@ -74,6 +73,7 @@ func (led *LEDArray) display(color uint32, delay int, brightness int) error {
 	}
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
 		led.ws.Leds(0)[i] = color
+		led.color = color
 		klog.V(10).Infof("setting led %d", i)
 		if err := led.ws.Render(); err != nil {
 			klog.Error(err)
