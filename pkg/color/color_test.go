@@ -1,4 +1,4 @@
-package main
+package color
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/stretchr/testify/assert"
+	"github.com/sudermanjr/led-controller/pkg/utils"
 )
 
 var testGradient1 = GradientTable{
@@ -71,7 +72,7 @@ func TestColorToUint32(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ColorToUint32(tt.color)
+			got := ToUint32(tt.color)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -112,7 +113,7 @@ func TestGradientPNG(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			GradientPNG(tt.gradient, tt.h, tt.w)
 			assert.FileExistsf(t, "gradient.png", "gradient.png should exist")
-			match := deepCompare("gradient.png", "testdata/"+tt.testFile)
+			match := utils.DeepCompareFiles("gradient.png", "testdata/"+tt.testFile)
 			assert.Truef(t, match, "the files must match")
 		})
 		os.Remove("gradient.png")

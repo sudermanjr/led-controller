@@ -1,4 +1,4 @@
-package main
+package color
 
 import (
 	"image"
@@ -11,6 +11,19 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	"k8s.io/klog"
 )
+
+//ColorMap is a map of named colors to hex values
+var ColorMap = map[string]string{
+	"blue":   "#0000ff",
+	"green":  "#00ff00",
+	"yellow": "#ffaf33",
+	"purple": "#af33ff",
+	"red":    "#ff0000",
+	"teal":   "#33ffd1",
+	"pink":   "#ff08c7",
+	"white":  "#ffffff",
+	"black":  "#000000", // This basically equates to off.
+}
 
 // GradientTable contains the "keypoints" of the colorgradient you want to generate.
 // The position of each keypoint has to live in the range [0,1]
@@ -47,12 +60,11 @@ func HexToColor(s string) colorful.Color {
 	return c
 }
 
-// ColorToUint32 converts a color object to a uint32
+// ToUint32 converts a color object to a uint32
 // for use by the neopixel
-func ColorToUint32(color colorful.Color) uint32 {
+func ToUint32(color colorful.Color) uint32 {
 	hex := color.Hex()
 	hex = strings.Replace(hex, "#", "", -1)
-	klog.V(10).Infof("hex value: %s", hex)
 	value, _ := strconv.ParseUint(hex, 16, 32)
 
 	return uint32(value)
