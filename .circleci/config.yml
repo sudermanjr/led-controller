@@ -16,8 +16,7 @@ jobs:
       - run: make lint
       - run: make test
   build-pizero:
-    docker:
-      - image: rok8s-scripts/ci-images
+    executor: rok8s-scripts/ci-images
     steps:
       - checkout
       - run: make build
@@ -33,6 +32,8 @@ workflows:
             tags:
               ignore: /.*/
       - build-pizero:
+          requires:
+            - test
           filters:
             branches:
               only: /.*/
