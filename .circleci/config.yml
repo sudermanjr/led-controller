@@ -15,6 +15,12 @@ jobs:
       - run: go get github.com/gojp/goreportcard/cmd/goreportcard-cli
       - run: make lint
       - run: make test
+  build-pizero:
+    docker:
+      - image: rok8s-scripts/ci-images
+    steps:
+      - checkout
+      - run: make build
 
 workflows:
   version: 2
@@ -25,7 +31,13 @@ workflows:
             branches:
               only: /.*/
             tags:
-              ignore: /v.*/
+              ignore: /.*/
+      - build-pizero:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              ignore: /.*/
       - rok8s-scripts/github_release:
           filters:
             branches:
