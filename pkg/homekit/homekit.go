@@ -104,7 +104,7 @@ func scaleHomekitBrightness(value int, minArray int, maxArray int) int {
 func modifySaturation(oldColor colorful.Color, saturation float64) colorful.Color {
 	h, s, v := oldColor.Hsv()
 	klog.V(8).Infof("old color h: %f, s: %f, v: %f", h, s, v)
-	s = saturation
+	s = saturation * .1 // hc sends this 1-100, but colorful uses 0-1
 	newColor := colorful.Hsv(h, s, v)
 	klog.V(8).Infof("new color h: %f, s: %f, v: %f", h, s, v)
 	return newColor
