@@ -12,6 +12,7 @@ Usage:
   led-controller [command]
 
 Available Commands:
+  dashboard   Run a dashboard
   demo        Run a demo.
   help        Help about any command
   homekit     Run the lights as a homekit accessory.
@@ -37,8 +38,6 @@ Flags:
       --stderrthreshold severity         logs at or above this threshold go to stderr (default 2)
   -v, --v Level                          number for the log level verbosity
       --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
-
-Use "led-controller [command] --help" for more information about a command.
 ```
 
 ## pi-builder

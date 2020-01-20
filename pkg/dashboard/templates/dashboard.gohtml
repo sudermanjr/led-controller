@@ -1,0 +1,11 @@
+{{define "dashboard"}}
+
+<h1>LED Control</h1>
+
+<form action="/control" method="post">
+    color:<input type="text" name="color">
+    brightness:<input type="number" name="brightness">
+    <input type="submit" value="set">
+</form>
+
+{{end}}
