@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
 )
@@ -64,10 +65,20 @@ func startHomekit() {
 
 	ac.Lightbulb.Hue.OnValueRemoteUpdate(func(value float64) {
 		klog.Infof("homekit hue set to: %f", value)
+		led.color = modifyHue(led.color, value)
+		err = led.display(0)
+		if err != nil {
+			klog.Error(err)
+		}
 	})
 
 	ac.Lightbulb.Saturation.OnValueRemoteUpdate(func(value float64) {
 		klog.Infof("homekit saturation set to %f", value)
+		led.color = modifySaturation(led.color, value)
+		err = led.display(0)
+		if err != nil {
+			klog.Error(err)
+		}
 	})
 
 	ac.Lightbulb.Brightness.OnValueRemoteUpdate(func(value int) {
@@ -108,4 +119,24 @@ func scaleHomekitBrightness(value int) int {
 	new := ((b-a)*(value-min))/(max-min) + a
 
 	return new
+}
+
+//modifySaturation changes the saturation and returns a new color
+func modifySaturation(oldColor colorful.Color, saturation float64) colorful.Color {
+	h, s, v := oldColor.Hsv()
+	klog.V(8).Infof("old color h: %f, s: %f, v: %f", h, s, v)
+	s = saturation
+	newColor := colorful.Hsv(h, s, v)
+	klog.V(8).Infof("new color h: %f, s: %f, v: %f", h, s, v)
+	return newColor
+}
+
+//modifyHue changes the hue and returns a new color
+func modifyHue(oldColor colorful.Color, hue float64) colorful.Color {
+	h, s, v := oldColor.Hsv()
+	klog.V(8).Infof("old color h: %f, s: %f, v: %f", h, s, v)
+	h = hue
+	newColor := colorful.Hsv(h, s, v)
+	klog.V(8).Infof("new color h: %f, s: %f, v: %f", h, s, v)
+	return newColor
 }
