@@ -25,7 +25,7 @@ repos:
       - id: forbid-binary
         exclude: >
           (?x)^(
-            testdata/.+\.png
+            pkg/color/testdata/.+\.png
           )$
       - id: shellcheck
       - id: git-check

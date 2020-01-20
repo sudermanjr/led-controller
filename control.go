@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
+
+	"github.com/sudermanjr/led-controller/pkg/color"
 )
 
 var onBrightness int
@@ -25,7 +27,7 @@ var onCmd = &cobra.Command{
 			klog.Fatal(err)
 		}
 		defer led.ws.Fini()
-		led.color = HexToColor(colors[colorName])
+		led.color = color.HexToColor(colorMap[colorName])
 		_ = led.fade(onBrightness)
 	},
 }

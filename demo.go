@@ -1,9 +1,12 @@
 package main
 
 import (
+	"time"
+
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
-	"time"
+
+	"github.com/sudermanjr/led-controller/pkg/color"
 )
 
 var (
@@ -22,18 +25,18 @@ func init() {
 	demoCmd.Flags().IntVar(&demoGradientLength, "gradient-count", 2048, "The number of steps in the gradient.")
 }
 
-var demoGradient = GradientTable{
-	{HexToColor("#9e0142"), 0.0},
-	{HexToColor("#d53e4f"), 0.1},
-	{HexToColor("#f46d43"), 0.2},
-	{HexToColor("#fdae61"), 0.3},
-	{HexToColor("#fee090"), 0.4},
-	{HexToColor("#ffffbf"), 0.5},
-	{HexToColor("#e6f598"), 0.6},
-	{HexToColor("#abdda4"), 0.7},
-	{HexToColor("#66c2a5"), 0.8},
-	{HexToColor("#3288bd"), 0.9},
-	{HexToColor("#5e4fa2"), 1.0},
+var demoGradient = color.GradientTable{
+	{color.HexToColor("#9e0142"), 0.0},
+	{color.HexToColor("#d53e4f"), 0.1},
+	{color.HexToColor("#f46d43"), 0.2},
+	{color.HexToColor("#fdae61"), 0.3},
+	{color.HexToColor("#fee090"), 0.4},
+	{color.HexToColor("#ffffbf"), 0.5},
+	{color.HexToColor("#e6f598"), 0.6},
+	{color.HexToColor("#abdda4"), 0.7},
+	{color.HexToColor("#66c2a5"), 0.8},
+	{color.HexToColor("#3288bd"), 0.9},
+	{color.HexToColor("#5e4fa2"), 1.0},
 }
 
 var demoCmd = &cobra.Command{
@@ -52,9 +55,9 @@ var demoCmd = &cobra.Command{
 		led.brightness = demoBrightness
 		// Loops through our list of pre-defined colors and display them in order.
 		for i := 0; i < (demoCount); i++ {
-			for colorName, color := range colors {
+			for colorName, colorValue := range colorMap {
 				klog.Infof("displaying: %s", colorName)
-				led.color = HexToColor(color)
+				led.color = color.HexToColor(colorValue)
 				_ = led.display(demoDelay)
 			}
 			_ = led.fade(minBrightness)
@@ -62,7 +65,7 @@ var demoCmd = &cobra.Command{
 
 			// Second part of demo - go through a color gradient really fast.
 			klog.V(3).Infof("starting color gradient")
-			colorList := GradientColorList(demoGradient, demoGradientLength)
+			colorList := color.GradientColorList(demoGradient, demoGradientLength)
 			for _, gradColor := range colorList {
 				led.color = gradColor
 				led.brightness = demoBrightness

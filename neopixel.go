@@ -6,9 +6,11 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
 	"k8s.io/klog"
+
+	"github.com/sudermanjr/led-controller/pkg/color"
 )
 
-var colors = map[string]string{
+var colorMap = map[string]string{
 	"blue":   "#0000ff",
 	"green":  "#00ff00",
 	"yellow": "#ffaf33",
@@ -59,7 +61,7 @@ func newledArray() (*ledArray, error) {
 	}
 	// Start with brightness off and color white
 	led.brightness = minBrightness
-	led.color = HexToColor(colors["white"])
+	led.color = color.HexToColor(colorMap["white"])
 
 	return led, nil
 }
@@ -74,7 +76,7 @@ func (led *ledArray) display(delay int) error {
 		return err
 	}
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
-		led.ws.Leds(0)[i] = ColorToUint32(led.color)
+		led.ws.Leds(0)[i] = color.ColorToUint32(led.color)
 		klog.V(10).Infof("setting led %d", i)
 		if err := led.ws.Render(); err != nil {
 			klog.Error(err)
@@ -125,7 +127,7 @@ func (led *ledArray) fade(target int) error {
 
 	//Set the color on all the LEDs
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
-		led.ws.Leds(0)[i] = ColorToUint32(led.color)
+		led.ws.Leds(0)[i] = color.ColorToUint32(led.color)
 	}
 
 	for _, step := range ramp {
