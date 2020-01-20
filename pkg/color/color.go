@@ -60,12 +60,11 @@ func HexToColor(s string) colorful.Color {
 	return c
 }
 
-// ColorToUint32 converts a color object to a uint32
+// ToUint32 converts a color object to a uint32
 // for use by the neopixel
-func ColorToUint32(color colorful.Color) uint32 {
+func ToUint32(color colorful.Color) uint32 {
 	hex := color.Hex()
 	hex = strings.Replace(hex, "#", "", -1)
-	klog.V(10).Infof("hex value: %s", hex)
 	value, _ := strconv.ParseUint(hex, 16, 32)
 
 	return uint32(value)

@@ -22,7 +22,7 @@ var homekitCmd = &cobra.Command{
 	Long:  `Run the lights as a homekit accessory.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		led, err := neopixel.NewLEDArray(maxBrightness, minBrightness, ledCount, fadeDuration)
+		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
 		if err != nil {
 			klog.Fatal(err)
 		}

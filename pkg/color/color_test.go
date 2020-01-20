@@ -72,7 +72,7 @@ func TestColorToUint32(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ColorToUint32(tt.color)
+			got := ToUint32(tt.color)
 			assert.Equal(t, tt.want, got)
 		})
 	}

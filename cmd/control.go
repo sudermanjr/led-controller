@@ -29,7 +29,10 @@ var onCmd = &cobra.Command{
 		}
 		defer led.WS.Fini()
 		led.Color = color.HexToColor(color.ColorMap[colorName])
-		_ = led.Fade(onBrightness)
+		err = led.SetMaxBrightness()
+		if err != nil {
+			klog.Fatal(err)
+		}
 	},
 }
 
@@ -43,6 +46,9 @@ var offCmd = &cobra.Command{
 			klog.Fatal(err)
 		}
 		defer led.WS.Fini()
-		_ = led.Fade(minBrightness)
+		err = led.SetMinBrightness()
+		if err != nil {
+			klog.Fatal(err)
+		}
 	},
 }

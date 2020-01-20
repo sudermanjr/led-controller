@@ -30,7 +30,7 @@ type LEDArray struct {
 }
 
 // NewLEDArray creates a new array and initializes it
-func NewLEDArray(maxBrightness int, minBrightness, ledCount int, fadeDuration int) (*LEDArray, error) {
+func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration int) (*LEDArray, error) {
 	// Setup the LED lights
 	opt := ws2811.DefaultOptions
 	opt.Channels[0].Brightness = maxBrightness
@@ -46,6 +46,7 @@ func NewLEDArray(maxBrightness int, minBrightness, ledCount int, fadeDuration in
 		Brightness:    minBrightness,
 		MinBrightness: minBrightness,
 		MaxBrightness: maxBrightness,
+		FadeDuration:  fadeDuration,
 		Color:         color.HexToColor(color.ColorMap["white"]),
 	}
 
@@ -69,7 +70,7 @@ func (led *LEDArray) Display(delay int) error {
 		return err
 	}
 	for i := 0; i < len(led.WS.Leds(0)); i++ {
-		led.WS.Leds(0)[i] = color.ColorToUint32(led.Color)
+		led.WS.Leds(0)[i] = color.ToUint32(led.Color)
 		klog.V(10).Infof("setting led %d", i)
 		if err := led.WS.Render(); err != nil {
 			klog.Error(err)
@@ -103,6 +104,15 @@ func (led *LEDArray) SetMaxBrightness() error {
 	return nil
 }
 
+// SetMinBrightness fades the LED array to the minimum brightness
+func (led *LEDArray) SetMinBrightness() error {
+	err := led.Fade(led.MinBrightness)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // checkBrightness checks to see if the value is
 // inside the min/max bounds. If it is out, fix it
 func (led *LEDArray) checkBrightness() {
@@ -129,7 +139,7 @@ func (led *LEDArray) Fade(target int) error {
 
 	//Set the color on all the LEDs
 	for i := 0; i < len(led.WS.Leds(0)); i++ {
-		led.WS.Leds(0)[i] = color.ColorToUint32(led.Color)
+		led.WS.Leds(0)[i] = color.ToUint32(led.Color)
 	}
 
 	for _, step := range ramp {
