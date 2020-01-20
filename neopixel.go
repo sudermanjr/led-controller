@@ -67,15 +67,14 @@ func newledArray() (*ledArray, error) {
 // display changes all of the LEDs one at a time
 // delay: sets the time between each LED coming on
 // brightness: sets the brightness for the entire thing
-func (led *ledArray) display(color colorful.Color, delay int, brightness int) error {
-	klog.V(6).Infof("setting led array to color: %v, delay: %d, brightness: %d", color, delay, brightness)
-	err := led.setBrightness(brightness)
+func (led *ledArray) display(delay int) error {
+	klog.V(6).Infof("setting led array to color: %v, delay: %d, brightness: %d", led.color, delay, led.brightness)
+	err := led.setBrightness(led.brightness)
 	if err != nil {
 		return err
 	}
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
-		led.ws.Leds(0)[i] = ColorToUint32(color)
-		led.color = color
+		led.ws.Leds(0)[i] = ColorToUint32(led.color)
 		klog.V(10).Infof("setting led %d", i)
 		if err := led.ws.Render(); err != nil {
 			klog.Error(err)
@@ -120,15 +119,14 @@ func brightnessBounds(value int) int {
 }
 
 // fade goes to a new brightness in the duration specified
-func (led *ledArray) fade(color colorful.Color, target int) error {
+func (led *ledArray) fade(target int) error {
 	klog.V(8).Infof("fading brightness to %d", target)
-	klog.V(8).Infof("setting color to %v", color)
+	klog.V(8).Infof("setting color to %v", led.color)
 	ramp := stepRamp(float64(led.brightness), float64(target), float64(fadeDuration))
 
 	//Set the color on all the LEDs
-	led.color = color
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
-		led.ws.Leds(0)[i] = ColorToUint32(color)
+		led.ws.Leds(0)[i] = ColorToUint32(led.color)
 	}
 
 	for _, step := range ramp {

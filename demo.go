@@ -49,24 +49,28 @@ var demoCmd = &cobra.Command{
 		}
 		defer led.ws.Fini()
 
+		led.brightness = demoBrightness
 		// Loops through our list of pre-defined colors and display them in order.
 		for i := 0; i < (demoCount); i++ {
 			for colorName, color := range colors {
 				klog.Infof("displaying: %s", colorName)
-				_ = led.display(HexToColor(color), demoDelay, demoBrightness)
+				led.color = HexToColor(color)
+				_ = led.display(demoDelay)
 			}
-			_ = led.fade(led.color, minBrightness)
+			_ = led.fade(minBrightness)
 			time.Sleep(500 * time.Millisecond)
 
 			// Second part of demo - go through a color gradient really fast.
 			klog.V(3).Infof("starting color gradient")
 			colorList := GradientColorList(demoGradient, demoGradientLength)
 			for _, gradColor := range colorList {
-				_ = led.display(gradColor, 0, demoBrightness)
+				led.color = gradColor
+				led.brightness = demoBrightness
+				_ = led.display(0)
 				time.Sleep(time.Duration(demoDelay) * time.Nanosecond)
 			}
 		}
 
-		_ = led.fade(led.color, minBrightness)
+		_ = led.fade(minBrightness)
 	},
 }
