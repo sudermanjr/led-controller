@@ -3,20 +3,21 @@ package main
 import (
 	"time"
 
+	"github.com/lucasb-eyer/go-colorful"
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
 	"k8s.io/klog"
 )
 
-var colors = map[string]uint32{
-	"blue":   uint32(0x0000ff),
-	"green":  uint32(0x00ff00),
-	"yellow": uint32(0xffaf33),
-	"purple": uint32(0xaf33ff),
-	"red":    uint32(0xff0000),
-	"teal":   uint32(0x33ffd1),
-	"pink":   uint32(0xff08c7),
-	"white":  uint32(0xffffff),
-	"black":  uint32(0x000000), // This basically equates to off.
+var colors = map[string]string{
+	"blue":   "#0000ff",
+	"green":  "#00ff00",
+	"yellow": "#ffaf33",
+	"purple": "#af33ff",
+	"red":    "#ff0000",
+	"teal":   "#33ffd1",
+	"pink":   "#ff08c7",
+	"white":  "#ffffff",
+	"black":  "#000000", // This basically equates to off.
 }
 
 type wsEngine interface {
@@ -28,14 +29,14 @@ type wsEngine interface {
 	SetBrightness(channel int, brightness int)
 }
 
-// LEDArray is a struct for interacting with LEDs
-type LEDArray struct {
+// ledArray is a struct for interacting with LEDs
+type ledArray struct {
 	ws         wsEngine
 	brightness int
-	color      uint32
+	color      colorful.Color
 }
 
-func newLEDArray() (*LEDArray, error) {
+func newledArray() (*ledArray, error) {
 	// Setup the LED lights
 	opt := ws2811.DefaultOptions
 	opt.Channels[0].Brightness = maxBrightness
@@ -46,7 +47,7 @@ func newLEDArray() (*LEDArray, error) {
 		return nil, err
 	}
 
-	led := &LEDArray{
+	led := &ledArray{
 		ws: dev,
 	}
 
@@ -56,23 +57,24 @@ func newLEDArray() (*LEDArray, error) {
 		klog.Error(err)
 		return nil, err
 	}
-	// Start off
+	// Start with brightness off and color white
 	led.brightness = minBrightness
-	led.color = colors["white"]
+	led.color = HexToColor(colors["white"])
+
 	return led, nil
 }
 
 // display changes all of the LEDs one at a time
 // delay: sets the time between each LED coming on
 // brightness: sets the brightness for the entire thing
-func (led *LEDArray) display(color uint32, delay int, brightness int) error {
-	klog.V(6).Infof("setting led array to color: %d, delay: %d, brightness: %d", color, delay, brightness)
+func (led *ledArray) display(color colorful.Color, delay int, brightness int) error {
+	klog.V(6).Infof("setting led array to color: %v, delay: %d, brightness: %d", color, delay, brightness)
 	err := led.setBrightness(brightness)
 	if err != nil {
 		return err
 	}
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
-		led.ws.Leds(0)[i] = color
+		led.ws.Leds(0)[i] = ColorToUint32(color)
 		led.color = color
 		klog.V(10).Infof("setting led %d", i)
 		if err := led.ws.Render(); err != nil {
@@ -87,7 +89,7 @@ func (led *LEDArray) display(color uint32, delay int, brightness int) error {
 // setBrightness turns the LED array to a brightness value
 // and sets the led.brightness value accordingly
 // if it goes out of bounds, it will be set to min or max
-func (led *LEDArray) setBrightness(value int) error {
+func (led *ledArray) setBrightness(value int) error {
 	value = brightnessBounds(value)
 	klog.V(8).Infof("setting brightness to %d", value)
 	led.ws.SetBrightness(0, value)
@@ -118,15 +120,15 @@ func brightnessBounds(value int) int {
 }
 
 // fade goes to a new brightness in the duration specified
-func (led *LEDArray) fade(color uint32, target int) error {
-
+func (led *ledArray) fade(color colorful.Color, target int) error {
 	klog.V(8).Infof("fading brightness to %d", target)
-	klog.V(8).Infof("setting color to %d", color)
+	klog.V(8).Infof("setting color to %v", color)
 	ramp := stepRamp(float64(led.brightness), float64(target), float64(fadeDuration))
 
 	//Set the color on all the LEDs
+	led.color = color
 	for i := 0; i < len(led.ws.Leds(0)); i++ {
-		led.ws.Leds(0)[i] = color
+		led.ws.Leds(0)[i] = ColorToUint32(color)
 	}
 
 	for _, step := range ramp {

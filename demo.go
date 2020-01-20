@@ -43,7 +43,7 @@ var demoCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Initialize the LEDs
-		led, err := newLEDArray()
+		led, err := newledArray()
 		if err != nil {
 			klog.Fatal(err)
 		}
@@ -53,7 +53,7 @@ var demoCmd = &cobra.Command{
 		for i := 0; i < (demoCount); i++ {
 			for colorName, color := range colors {
 				klog.Infof("displaying: %s", colorName)
-				_ = led.display(color, demoDelay, demoBrightness)
+				_ = led.display(HexToColor(color), demoDelay, demoBrightness)
 			}
 			_ = led.fade(led.color, minBrightness)
 			time.Sleep(500 * time.Millisecond)
@@ -62,7 +62,7 @@ var demoCmd = &cobra.Command{
 			klog.V(3).Infof("starting color gradient")
 			colorList := GradientColorList(demoGradient, demoGradientLength)
 			for _, gradColor := range colorList {
-				_ = led.display(ColorToUint32(gradColor), 0, demoBrightness)
+				_ = led.display(gradColor, 0, demoBrightness)
 				time.Sleep(time.Duration(demoDelay) * time.Nanosecond)
 			}
 		}

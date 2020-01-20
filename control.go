@@ -20,12 +20,12 @@ var onCmd = &cobra.Command{
 	Short: "Turn on the lights.",
 	Long:  `Turns on the lights to a specific color.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		led, err := newLEDArray()
+		led, err := newledArray()
 		if err != nil {
 			klog.Fatal(err)
 		}
 		defer led.ws.Fini()
-		led.color = colors[colorName]
+		led.color = HexToColor(colors[colorName])
 		_ = led.fade(led.color, onBrightness)
 	},
 }
@@ -35,7 +35,7 @@ var offCmd = &cobra.Command{
 	Short: "Turn off the lights.",
 	Long:  `Turns off the lights.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		led, err := newLEDArray()
+		led, err := newledArray()
 		if err != nil {
 			klog.Fatal(err)
 		}

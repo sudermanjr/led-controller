@@ -40,7 +40,7 @@ func startHomekit() {
 		klog.Fatal(err)
 	}
 
-	led, err := newLEDArray()
+	led, err := newledArray()
 	if err != nil {
 		klog.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func startHomekit() {
 
 	ac.Lightbulb.Brightness.OnValueRemoteUpdate(func(value int) {
 		klog.Infof("homekit brightness set to: %d", value)
-		err = led.fade(colors["white"], scaleHomekitBrightness(value))
+		err = led.fade(HexToColor(colors["white"]), scaleHomekitBrightness(value))
 		if err != nil {
 			klog.Error(err)
 		}
