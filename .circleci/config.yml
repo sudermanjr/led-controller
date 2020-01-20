@@ -32,14 +32,6 @@ workflows:
               only: /.*/
             tags:
               ignore: /.*/
-      - build-pizero:
-          requires:
-            - test
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              ignore: /.*/
       - rok8s-scripts/github_release:
           filters:
             branches:
