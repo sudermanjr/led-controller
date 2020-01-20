@@ -69,7 +69,7 @@ func newledArray() (*ledArray, error) {
 // brightness: sets the brightness for the entire thing
 func (led *ledArray) display(delay int) error {
 	klog.V(6).Infof("setting led array to color: %v, delay: %d, brightness: %d", led.color, delay, led.brightness)
-	err := led.setBrightness(led.brightness)
+	err := led.setBrightness()
 	if err != nil {
 		return err
 	}
@@ -88,34 +88,33 @@ func (led *ledArray) display(delay int) error {
 // setBrightness turns the LED array to a brightness value
 // and sets the led.brightness value accordingly
 // if it goes out of bounds, it will be set to min or max
-func (led *ledArray) setBrightness(value int) error {
-	value = brightnessBounds(value)
-	klog.V(8).Infof("setting brightness to %d", value)
-	led.ws.SetBrightness(0, value)
+func (led *ledArray) setBrightness() error {
+	led.checkBrightness()
+	klog.V(8).Infof("setting brightness to %d", led.brightness)
+	led.ws.SetBrightness(0, led.brightness)
 	err := led.ws.Render()
 	if err != nil {
 		return err
 	}
-	led.brightness = value
-	klog.V(10).Infof("storing brightness as %d", led.brightness)
 	return nil
 }
 
-// brightnessBounds checks to see if the value is
-// inside the min/max bounds. If it is out, return
-// the appropriate min or max
-func brightnessBounds(value int) int {
+// checkBrightness checks to see if the value is
+// inside the min/max bounds. If it is out, fix it
+func (led *ledArray) checkBrightness() {
 	// Check the bounds
-	klog.V(10).Infof("comparing value %d to min: %d, max: %d", value, minBrightness, maxBrightness)
-	if value < minBrightness {
-		klog.V(8).Infof("brightness %d below bounds, setting to %d", value, minBrightness)
-		return minBrightness
-	} else if value > maxBrightness {
-		klog.V(8).Infof("brightness %d above bounds, setting to %d", value, maxBrightness)
-		return maxBrightness
+	klog.V(10).Infof("comparing value %d to min: %d, max: %d", led.brightness, minBrightness, maxBrightness)
+	if led.brightness < minBrightness {
+		klog.V(8).Infof("brightness %d below bounds, setting to %d", led.brightness, minBrightness)
+		led.brightness = minBrightness
+		return
 	}
-	klog.V(8).Infof("not out of bounds. returning %d", value)
-	return value
+	if led.brightness > maxBrightness {
+		klog.V(8).Infof("brightness %d above bounds, setting to %d", led.brightness, maxBrightness)
+		led.brightness = maxBrightness
+		return
+	}
+	klog.V(8).Infof("not out of bounds. leaving it set as %d", led.brightness)
 }
 
 // fade goes to a new brightness in the duration specified
@@ -131,7 +130,8 @@ func (led *ledArray) fade(target int) error {
 
 	for _, step := range ramp {
 		klog.V(10).Infof("processing step: %d", step)
-		err := led.setBrightness(step)
+		led.brightness = step
+		err := led.setBrightness()
 		if err != nil {
 			return err
 		}
