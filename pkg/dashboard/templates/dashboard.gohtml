@@ -2,10 +2,21 @@
 
 <h1>LED Control</h1>
 
-<form action="/control" method="post">
+<div>
+<form action="/control" method="post" id="control">
     color:<input type="text" name="color">
     brightness:<input type="number" name="brightness">
-    <input type="submit" value="set">
+    <input type="submit" value="set" id="control">
 </form>
+</div>
+
+
+<div>
+<form action="/demo" method="post" id="demo">
+    delay:<input type="number" name="delay">
+    brightness:<input type="number" name="brightness">
+    <input type="submit" value="run" id="demo">
+</form>
+</div>
 
 {{end}}
