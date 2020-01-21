@@ -21,6 +21,8 @@ build-local-arm:
 	file led-controller
 build-circle-arm:
 	docker run --rm -it -w $(PKG_PATH) rpi-ws281x-go-builder /usr/bin/qemu-arm-static /bin/sh -c "$(GOBUILD) -ldflags $(LDFLAGS) -o $(PKG_PATH)/$(BINARY_NAME) -v"
+build-osx:
+	$(GOBUILD)
 create-builder:
 	docker build --tag rpi-ws281x-go-builder .
 lint:
