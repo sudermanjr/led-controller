@@ -40,6 +40,14 @@ Flags:
       --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
 ```
 
+## homekit
+
+`led-controller homekit` will start this as a homekit device. Check the help for options, specifically the homekit pin. The homekit device will work with color and brightness controls once registered.
+
+## dashboard
+
+Currently under heavy development. The dashboard will allow viewing and controlling the neopixel strip.
+
 ## pi-builder
 
 This is the cloud-init for building my pi image using Hypriot. I have encrypted the cloud-init.yaml file using sops and pgp since it contains secrets. There's not much to this file, so it should be easy to re-create on your own if you like.
