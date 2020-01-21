@@ -12,6 +12,7 @@ Usage:
   led-controller [command]
 
 Available Commands:
+  dashboard   Run a dashboard
   demo        Run a demo.
   help        Help about any command
   homekit     Run the lights as a homekit accessory.
@@ -37,9 +38,15 @@ Flags:
       --stderrthreshold severity         logs at or above this threshold go to stderr (default 2)
   -v, --v Level                          number for the log level verbosity
       --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
-
-Use "led-controller [command] --help" for more information about a command.
 ```
+
+## homekit
+
+`led-controller homekit` will start this as a homekit device. Check the help for options, specifically the homekit pin. The homekit device will work with color and brightness controls once registered.
+
+## dashboard
+
+Currently under heavy development. The dashboard will allow viewing and controlling the neopixel strip.
 
 ## pi-builder
 
