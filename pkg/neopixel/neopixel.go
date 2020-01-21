@@ -190,7 +190,8 @@ func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
 			led.Color = color.HexToColor(colorValue)
 			_ = led.Display(delay)
 		}
-		_ = led.Fade(led.MinBrightness)
+		led.Color = color.HexToColor(color.ColorMap["black"])
+		_ = led.Display(0)
 		time.Sleep(500 * time.Millisecond)
 
 		// Second part of demo - go through a color gradient really fast.
