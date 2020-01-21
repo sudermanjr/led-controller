@@ -29,6 +29,20 @@ type LEDArray struct {
 	FadeDuration  int
 }
 
+var demoGradient = color.GradientTable{
+	{color.HexToColor("#9e0142"), 0.0},
+	{color.HexToColor("#d53e4f"), 0.1},
+	{color.HexToColor("#f46d43"), 0.2},
+	{color.HexToColor("#fdae61"), 0.3},
+	{color.HexToColor("#fee090"), 0.4},
+	{color.HexToColor("#ffffbf"), 0.5},
+	{color.HexToColor("#e6f598"), 0.6},
+	{color.HexToColor("#abdda4"), 0.7},
+	{color.HexToColor("#66c2a5"), 0.8},
+	{color.HexToColor("#3288bd"), 0.9},
+	{color.HexToColor("#5e4fa2"), 1.0},
+}
+
 // NewLEDArray creates a new array and initializes it
 func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration int) (*LEDArray, error) {
 	// Setup the LED lights
@@ -166,4 +180,28 @@ func stepRamp(start float64, stop float64, duration float64) []int {
 	}
 	klog.V(7).Infof("calculated ramp: %v", ramp)
 	return ramp
+}
+
+//Demo runs a demo of the LED capabilities
+func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
+	for i := 0; i < (count); i++ {
+		for colorName, colorValue := range color.ColorMap {
+			klog.Infof("displaying: %s", colorName)
+			led.Color = color.HexToColor(colorValue)
+			_ = led.Display(delay)
+		}
+		_ = led.Fade(led.MinBrightness)
+		time.Sleep(500 * time.Millisecond)
+
+		// Second part of demo - go through a color gradient really fast.
+		klog.V(3).Infof("starting color gradient")
+		colorList := color.GradientColorList(demoGradient, gradientLength)
+		for _, gradColor := range colorList {
+			led.Color = gradColor
+			_ = led.Display(0)
+			time.Sleep(time.Duration(delay) * time.Nanosecond)
+		}
+	}
+	_ = led.Fade(led.MinBrightness)
+
 }

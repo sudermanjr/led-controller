@@ -82,6 +82,7 @@ func (a *App) Initialize() {
 	//API
 	router.HandleFunc("/health", a.health).Methods("GET")
 	router.HandleFunc("/control", a.control).Methods("POST")
+	router.HandleFunc("/demo", a.demo).Methods("POST")
 
 	// HTML Dashboard
 	fileServer := http.FileServer(pkger.Dir("/pkg/dashboard/assets"))
@@ -150,6 +151,29 @@ func (a *App) control(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	http.Redirect(w, r, "/", 302)
+}
+
+func (a *App) demo(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	delay, err := strconv.ParseInt(r.Form["delay"][0], 10, 32)
+	if err != nil {
+		klog.Errorf("error processing delay: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	brightness, err := strconv.ParseInt(r.Form["brightness"][0], 10, 32)
+	if err != nil {
+		klog.Errorf("error processing brightness: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	a.Array.Brightness = int(brightness)
+	a.Array.Demo(1, int(delay), 1000)
 
 	http.Redirect(w, r, "/", 302)
 }
