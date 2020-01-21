@@ -40,19 +40,19 @@ Flags:
       --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
 ```
 
-## homekit
+## Homekit
 
 `led-controller homekit` will start this as a homekit device. Check the help for options, specifically the homekit pin. The homekit device will work with color and brightness controls once registered.
 
-## dashboard
+## Dashboard
 
 Currently under heavy development. The dashboard will allow viewing and controlling the neopixel strip.
 
-## pi-builder
+## Building your Pi Controller
 
-This is the cloud-init for building my pi image using Hypriot. I have encrypted the cloud-init.yaml file using sops and pgp since it contains secrets. There's not much to this file, so it should be easy to re-create on your own if you like.
+In the [pi-builder](pi-builder) directory is the cloud-init for building my pi image using Hypriot. I have encrypted the cloud-init.yaml file using sops and pgp since it contains secrets. There's not much to this file, so it should be easy to re-create on your own if you like.
 
-## Cross Compiling
+## Compiling
 
 This is cross-compiled for the Raspberry Pi using the instructions in the rpi-ws281x repository. This utilizes a build container that is based on the [Balena Golang Image](https://registry.hub.docker.com/r/balenalib/raspberry-pi-golang). If you are using a different Pi, you will want to change the base image in the [Dockerfile](Dockerfile)
 
@@ -60,7 +60,7 @@ The build commands are in the [Makefile](Makefile). You can `make build` to buil
 
 The build will also create a local `.tmp` directory for storing build cache so that subsequent builds are much much faster.
 
-Another word of caution: This container build will utilized your local GOPATH so that it doesn't have to download every package every time.
+Another word of caution: This container build will utilize your local GOPATH and GOCACHE so that it doesn't have to download every package every time.
 
 ## References
 
