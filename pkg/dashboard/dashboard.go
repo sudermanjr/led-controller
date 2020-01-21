@@ -147,7 +147,7 @@ func (a *App) control(w http.ResponseWriter, r *http.Request) {
 
 	a.Array.Color = colorValue
 	a.Array.Brightness = int(brightness)
-	err = a.Array.Display(200)
+	err = a.Array.Display(0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
