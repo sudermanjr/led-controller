@@ -71,7 +71,7 @@ func (led *LEDArray) Display(delay int) error {
 	}
 	for i := 0; i < len(led.WS.Leds(0)); i++ {
 		led.WS.Leds(0)[i] = color.ToUint32(led.Color)
-		klog.V(10).Infof("setting led %d", i)
+		klog.V(9).Infof("setting led %d to color: %v brightness: %d", i, led.Color, led.Brightness)
 		if err := led.WS.Render(); err != nil {
 			klog.Error(err)
 			return err
@@ -86,7 +86,7 @@ func (led *LEDArray) Display(delay int) error {
 // if it goes out of bounds, it will be set to min or max
 func (led *LEDArray) setBrightness() error {
 	led.checkBrightness()
-	klog.V(8).Infof("setting brightness to %d", led.Brightness)
+	klog.V(10).Infof("setting brightness to %d", led.Brightness)
 	led.WS.SetBrightness(0, led.Brightness)
 	err := led.WS.Render()
 	if err != nil {
