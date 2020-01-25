@@ -3,3 +3,8 @@ name: LED Controller Styleguide
 examples:
     css:
         - "pkg/dashboard/assets/css/main.css"
+
+theme:
+    sidebar:
+        background: hsl(183, 100%, 35%)
+        textColor: hsl(0, 0%, 93%)

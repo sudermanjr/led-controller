@@ -1,6 +1,64 @@
-body {
-  margin: 0;
-  font-family: 'Muli', 'Helvetica', 'Arial', sans-serif;
-  background: #f5f5f5;
-  line-height: 1.3em;
+:root {
+    --color-bg: hsl(216, 18%, 16%);
+    --color-bg-offset: hsl(217, 10%, 25%);
+    --color-fg: hsl(0, 0%, 93%);
+    --color-accent: hsl(183, 100%, 35%);
+
+    --font-family-display: 'Share Tech Mono', monospace;
+    --font-family-primary: 'Work Sans', sans-serif;
+    --font-family-secondary: 'Open Sans', sans-serif;
+
+    --font-size-xs: 12px;
+    --font-size-s: 16px;
+    --font-size-m: 20px;
+    --font-size-l: 24px;
+    --font-size-xl: 30px;
+    --font-size-xxl: 36px;
+    --font-size-xxxl: 48px;
+
+    --space-s: 4px;
+    --space-m: 8px;
+    --space-l: 16px;
+    --space-xl: 32px;
+    --space-xxl: 64px;
 }
+
+body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-family-primary), "Andale Mono";
+    line-height: 1.25;
+    margin: 0;
+}
+
+form {
+    background: var(--color-bg-offset);
+}
+
+p {
+    line-height: 1.5;
+}
+
+/*
+---
+name: Font Sizes
+category: Utility
+---
+
+```sizes.html
+<div class="font-size-xs">Some words go here.</div>
+<div class="font-size-s">Some words go here.</div>
+<div class="font-size-m">Some words go here.</div>
+<div class="font-size-l">Some words go here.</div>
+<div class="font-size-xl">Some words go here.</div>
+<div class="font-size-xxl">Some words go here.</div>
+<div class="font-size-xxxl">Some words go here.</div>
+```
+*/
+.font-size-xs { font-size: var(--font-size-xs); }
+.font-size-s { font-size: var(--font-size-s); }
+.font-size-m { font-size: var(--font-size-m); }
+.font-size-l { font-size: var(--font-size-l); }
+.font-size-xl { font-size: var(--font-size-xl); }
+.font-size-xxl { font-size: var(--font-size-xxl); }
+.font-size-xxxl { font-size: var(--font-size-xxxl); }
