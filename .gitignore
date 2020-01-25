@@ -3,3 +3,5 @@ init-decrypted
 coverage.txt
 *-report.out
 .tmp
+/node_modules
+/stylemark

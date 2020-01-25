@@ -1,0 +1,5 @@
+name: LED Controller Styleguide
+
+examples:
+    css:
+        - "pkg/dashboard/assets/css/main.css"
