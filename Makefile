@@ -53,3 +53,5 @@ package:
 	pkger
 styleguide:
 	stylemark -i pkg/dashboard/assets/css -o stylemark -c .stylemark.yml -w -b 8081
+run-dashboard:
+	go run main.go dashboard
