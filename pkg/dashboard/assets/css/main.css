@@ -31,12 +31,38 @@ body {
     margin: 0;
 }
 
-form {
-    background: var(--color-bg-offset);
-}
-
 p {
     line-height: 1.5;
+}
+
+.card {
+    background: var(--color-bg-offset);
+    border-radius: var(--space-s);
+    margin: var(--space-m);
+    max-width: 55ch;
+    padding: var(--space-l);
+    width: max-content;
+}
+
+.card form {
+    display: grid;
+    grid-gap: var(--space-l);
+    grid-template-columns: auto 1fr;
+}
+.card form input { grid-column: 2; }
+.card form input[type="submit"] { grid-column: 1 / -1; justify-self: center; }
+.card form label { grid-column: 1; }
+
+.card-heading {
+    border-bottom: 1px solid var(--color-accent);
+}
+
+.container-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 80vw;
 }
 
 /*
