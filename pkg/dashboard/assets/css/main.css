@@ -31,6 +31,24 @@ body {
     margin: 0;
 }
 
+input {
+    background: none;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--space-s);
+    color: var(--color-fg);
+}
+
+input[type="submit"] {
+    align-items: center;
+    background: var(--color-accent);
+    display: flex;
+    font-weight: bold;
+    justify-content: center;
+    padding: var(--space-s) var(--space-m);
+    text-transform: uppercase;
+    min-width: 75px;
+}
+
 p {
     line-height: 1.5;
 }
@@ -50,7 +68,7 @@ p {
     grid-template-columns: auto 1fr;
 }
 .card form input { grid-column: 2; }
-.card form input[type="submit"] { grid-column: 1 / -1; justify-self: center; }
+.card form input[type="submit"] { grid-column: 1 / -1; justify-self: end; }
 .card form label { grid-column: 1; }
 
 .card-heading {
