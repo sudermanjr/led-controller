@@ -2,8 +2,10 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 
 	"k8s.io/klog"
@@ -13,8 +15,6 @@ const chunkSize = 64000
 
 //DeepCompareFiles compares two files
 func DeepCompareFiles(file1, file2 string) bool {
-	// Check file size ...
-
 	f1, err := os.Open(file1)
 	if err != nil {
 		klog.Fatal(err)
@@ -48,4 +48,40 @@ func DeepCompareFiles(file1, file2 string) bool {
 			return false
 		}
 	}
+}
+
+//IPAddress returns the current IP Address
+func IPAddress() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			return "", err
+		}
+
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+
+			klog.V(8).Infof("IP Found: %s", ip.String())
+
+			switch ip.String() {
+			case "127.0.0.1":
+				continue
+			case "::1":
+				continue
+			}
+			return ip.String(), nil
+		}
+	}
+	return "", fmt.Errorf("Blank IP found")
 }

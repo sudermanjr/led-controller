@@ -6,16 +6,20 @@ import (
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/dashboard"
+	"github.com/sudermanjr/led-controller/pkg/homekit"
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
+	"github.com/sudermanjr/led-controller/pkg/screen"
 )
 
 var (
 	serverPort int
+	homekitPin string
 )
 
 func init() {
 	rootCmd.AddCommand(dashboardCmd)
 	dashboardCmd.PersistentFlags().IntVarP(&serverPort, "port", "p", 8080, "The port to serve the dashboard on.")
+	dashboardCmd.PersistentFlags().StringVar(&homekitPin, "homekit-pin", "29847290", "The pin that homekit will use to authenticate with this device.")
 }
 
 var dashboardCmd = &cobra.Command{
@@ -29,11 +33,21 @@ var dashboardCmd = &cobra.Command{
 			klog.Fatal(err)
 		}
 
+		// Initialize the LCD display
+		display, err := screen.NewDisplay(displayRSPin, displayEPin, displayDataPins, lineSize)
+		if err != nil {
+			klog.Fatal(err)
+		}
+		defer display.LCD.Close()
+
 		app := dashboard.App{
-			Array: led,
-			Port:  serverPort,
+			Array:  led,
+			Port:   serverPort,
+			Screen: display,
 		}
 		app.Initialize()
-		app.Run()
+
+		go homekit.Start(homekitPin, led)
+		go app.Run()
 	},
 }

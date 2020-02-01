@@ -13,6 +13,7 @@ import (
 
 	"github.com/sudermanjr/led-controller/pkg/color"
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
+	"github.com/sudermanjr/led-controller/pkg/screen"
 )
 
 // App encapsulates all the config for the server
@@ -20,6 +21,7 @@ type App struct {
 	Router *mux.Router
 	Port   int
 	Array  *neopixel.LEDArray
+	Screen *screen.Display
 }
 
 func getBaseTemplate() (*template.Template, error) {
@@ -95,6 +97,11 @@ func (a *App) Initialize() {
 		rootHandler(w, r)
 	})
 
+	// Display Info On Screen
+	err := a.Screen.InfoDisplay()
+	if err != nil {
+		klog.Error(err)
+	}
 	a.Router = router
 }
 

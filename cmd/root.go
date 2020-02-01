@@ -11,13 +11,17 @@ import (
 )
 
 var (
-	version       = "development"
-	commit        = "n/a"
-	ledCount      int
-	maxBrightness int
-	minBrightness int
-	fadeDuration  int
-	colorName     string
+	version         = "development"
+	commit          = "n/a"
+	ledCount        int
+	maxBrightness   int
+	minBrightness   int
+	fadeDuration    int
+	colorName       string
+	displayRSPin    int
+	displayEPin     int
+	lineSize        int
+	displayDataPins []int
 )
 
 func init() {
@@ -26,6 +30,12 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&maxBrightness, "max-brightness", 200, "The maximum brightness that will work within the 0-250 range.")
 	rootCmd.PersistentFlags().IntVar(&minBrightness, "min-brightness", 25, "The minimum brightness that will work within the 0-250 range.")
 	rootCmd.PersistentFlags().IntVarP(&fadeDuration, "fade-duration", "f", 100, "The duration of fade-ins and fade-outs in ms.")
+
+	// LCD Screen Flags
+	rootCmd.PersistentFlags().IntVar(&displayRSPin, "rs-pin", 25, "The GPIO number connected to the RS Pin on the LCD display.")
+	rootCmd.PersistentFlags().IntVar(&displayEPin, "e-pin", 24, "The GPIO number connected to the E pin on the LCD display.")
+	rootCmd.PersistentFlags().IntVar(&lineSize, "line-size", 16, "The line size of the LCD display.")
+	rootCmd.PersistentFlags().IntSliceVar(&displayDataPins, "data-pins", []int{23, 17, 18, 22}, "The data pins connected to the LCD")
 
 	//Commands
 	rootCmd.AddCommand(versionCmd)
@@ -38,7 +48,7 @@ func init() {
 		"LED_COUNT":      "led-count",
 		"MAX_BRIGHTNESS": "max-brightness",
 		"MIN_BRIGHTNESS": "min-brightness",
-		"FADE_DURTION":   "fade-duration",
+		"FADE_DURATION":  "fade-duration",
 	}
 
 	for env, flag := range environmentVariables {

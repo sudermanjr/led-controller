@@ -49,6 +49,11 @@ var screenDemoCmd = &cobra.Command{
 	Long:  `Runs a demo of the lcd screen.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		screen.Demo()
+		display, err := screen.NewDisplay(displayRSPin, displayEPin, displayDataPins, lineSize)
+		if err != nil {
+			klog.Fatal(err)
+		}
+		defer display.LCD.Close()
+		display.Demo()
 	},
 }
