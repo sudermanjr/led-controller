@@ -2,6 +2,7 @@
 init-decrypted
 coverage.txt
 *-report.out
+/pkged.go
 .tmp
 /node_modules
 /stylemark
