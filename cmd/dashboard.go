@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/spf13/cobra"
 
 	"k8s.io/klog"
@@ -49,5 +53,15 @@ var dashboardCmd = &cobra.Command{
 
 		go homekit.Start(homekitPin, led)
 		go app.Run()
+
+		// create a channel to respond to signals
+		signals := make(chan os.Signal, 1)
+		defer close(signals)
+
+		signal.Notify(signals, syscall.SIGTERM)
+		signal.Notify(signals, syscall.SIGINT)
+		s := <-signals
+		//stop <- true
+		klog.Infof("Exiting, got signal: %v", s)
 	},
 }
