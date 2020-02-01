@@ -51,3 +51,7 @@ decrypt-init:
 	sops -d pi-builder/cloud-init.yaml | yq r - data > pi-builder/init-decrypted
 package:
 	pkger
+styleguide:
+	stylemark -i pkg/dashboard/assets/css -o stylemark -c .stylemark.yml -w -b 8081
+run-dashboard:
+	go run main.go dashboard
