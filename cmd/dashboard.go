@@ -12,7 +12,6 @@ import (
 	"github.com/sudermanjr/led-controller/pkg/dashboard"
 	"github.com/sudermanjr/led-controller/pkg/homekit"
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
-	"github.com/sudermanjr/led-controller/pkg/screen"
 )
 
 var (
@@ -37,17 +36,17 @@ var dashboardCmd = &cobra.Command{
 			klog.Fatal(err)
 		}
 
-		// Initialize the LCD display
-		display, err := screen.NewDisplay(displayRSPin, displayEPin, displayDataPins, lineSize)
-		if err != nil {
-			klog.Fatal(err)
-		}
-		defer display.LCD.Close()
+		// // Initialize the LCD display
+		// display, err := screen.NewDisplay(displayRSPin, displayEPin, displayDataPins, lineSize)
+		// if err != nil {
+		// 	klog.Fatal(err)
+		// }
+		// defer display.LCD.Close()
 
 		app := dashboard.App{
-			Array:  led,
-			Port:   serverPort,
-			Screen: display,
+			Array: led,
+			Port:  serverPort,
+			// Screen: display,
 		}
 		app.Initialize()
 
