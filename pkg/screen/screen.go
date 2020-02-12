@@ -57,11 +57,49 @@ func NewDisplay() (*Display, error) {
 }
 
 // Demo runs a screen demo
-func (display *Display) Demo() {
-
-	g, err := openGif("ballerine.gif")
+func (display *Display) Demo() error {
+	err := display.displayGif("ballerine.gif")
 	if err != nil {
-		klog.Fatal(err)
+		return err
+	}
+
+	err = display.clear()
+	if err != nil {
+		return err
+	}
+
+	err = display.InfoDisplay()
+	if err != nil {
+		return err
+	}
+
+	err = display.ScrollText(2, 16, "This is a test.")
+	if err != nil {
+		return err
+	}
+	err = display.ScrollText(2, 32, "This is a test.")
+	if err != nil {
+		return err
+	}
+	err = display.ScrollText(2, 48, "This is a test.")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (display *Display) clear() error {
+	err := display.displayGif("black.gif")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (display *Display) displayGif(gifName string) error {
+	g, err := openGif(gifName)
+	if err != nil {
+		return err
 	}
 
 	// Converts every frame to image.Gray and resize them:
@@ -77,14 +115,11 @@ func (display *Display) Demo() {
 		img := imgs[index]
 		err := display.LCD.Draw(img.Bounds(), img, image.Point{})
 		if err != nil {
-			klog.Error(err)
+			return err
 		}
 		<-c
 	}
-	err = display.InfoDisplay()
-	if err != nil {
-		klog.Error(err)
-	}
+	return nil
 }
 
 // Text displays text at a position
@@ -148,7 +183,7 @@ func (display *Display) InfoDisplay() error {
 		klog.Error(err)
 		return err
 	}
-	err = display.Text(0, 0, fmt.Sprintf("IP: %s", ip))
+	err = display.Text(0, 0, fmt.Sprintf(" IP: %s", ip))
 	if err != nil {
 		return err
 	}

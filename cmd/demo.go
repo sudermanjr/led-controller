@@ -53,6 +53,9 @@ var screenDemoCmd = &cobra.Command{
 		if err != nil {
 			klog.Fatal(err)
 		}
-		display.Demo()
+		err = display.Demo()
+		if err != nil {
+			klog.Fatal(err)
+		}
 	},
 }
