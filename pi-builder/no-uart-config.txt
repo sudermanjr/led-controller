@@ -8,3 +8,4 @@ gpu_mem=128
 
 # Enable audio (added by raspberrypi-sys-mods)
 dtparam=audio=on
+dtparam=i2c_arm=on

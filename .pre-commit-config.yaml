@@ -25,7 +25,8 @@ repos:
       - id: forbid-binary
         exclude: >
           (?x)^(
-            pkg/color/testdata/.+\.png
+            pkg/color/testdata/.+\.png|
+            pkg/screen/gifs/.+\.gif
           )$
       - id: shellcheck
       - id: git-check
