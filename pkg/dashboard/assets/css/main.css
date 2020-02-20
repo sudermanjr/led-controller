@@ -1,9 +1,36 @@
 :root {
-    --color-bg: hsl(216, 18%, 16%);
-    --color-bg-offset: hsl(217, 10%, 25%);
-    --color-fg: hsl(0, 0%, 93%);
-    --color-accent: hsl(183, 100%, 35%);
+    /***************************************************************** colors */
+    --color-dark: hsl(197, 94%, 6%);
+    --color-light: hsl(197, 94%, 94%);
+    --color-primary: hsl(197, 66%, 21%);
+    --color-primary-light: hsl(196, 24%, 46%);
+    --color-accent: hsl(126, 15%, 72%);
+    --color-accent-light: hsl(79, 55%, 92%);
 
+    --color-primary-shadow-light: hsl(197, 66%, 24%);
+    --color-primary-shadow-dark: hsl(197, 66%, 15%);
+
+    --gradient-primary: linear-gradient(145deg, var(--color-primary-shadow-dark), var(--color-primary-shadow-light));
+
+    --shadow-tl-far: -7px -7px 20px 0;
+    --shadow-tl-near: -4px -4px 5px 0;
+    --shadow-br-far: 7px 7px 20px 0;
+    --shadow-br-near: 4px 4px 5px 0;
+
+    --shadow:
+        var(--shadow-tl-far) var(--color-primary-shadow-light)
+        , var(--shadow-tl-near) var(--color-primary-shadow-light)
+        , var(--shadow-br-far) var(--color-primary-shadow-dark)
+        , var(--shadow-br-far) var(--color-primary-shadow-dark)
+    ;
+    --shadow-inset:
+        var(--shadow-tl-far) var(--color-primary-shadow-light) inset
+        , var(--shadow-tl-near) var(--color-primary-shadow-light) inset
+        , var(--shadow-br-far) var(--color-primary-shadow-dark) inset
+        , var(--shadow-br-near) var(--color-primary-shadow-dark) inset
+    ;
+
+    /****************************************************************** fonts */
     --font-family-display: 'Share Tech Mono', monospace;
     --font-family-primary: 'Work Sans', sans-serif;
     --font-family-secondary: 'Open Sans', sans-serif;
@@ -16,6 +43,7 @@
     --font-size-xxl: 36px;
     --font-size-xxxl: 48px;
 
+    /**************************************************************** spacers */
     --space-s: 4px;
     --space-m: 8px;
     --space-l: 16px;
@@ -24,15 +52,15 @@
 }
 
 body {
-    background: var(--color-bg);
-    color: var(--color-fg);
+    background: var(--color-primary);
+    color: var(--color-light);
     font-family: var(--font-family-primary), "Andale Mono";
     line-height: 1.25;
     margin: 0;
 }
 
 a {
-    color: var(--color-fg);
+    color: var(--color-light);
     transition: 0.25s;
 }
 
@@ -51,12 +79,15 @@ input {
     background: none;
     border: 1px solid var(--color-accent);
     border-radius: var(--space-s);
-    color: var(--color-fg);
+    box-shadow: var(--shadow-inset);
+    color: var(--color-light);
 }
 
 input[type="submit"] {
     align-items: center;
     background: var(--color-accent);
+    box-shadow: var(--shadow);
+    color: var(--color-dark);
     display: flex;
     font-weight: bold;
     justify-content: center;
@@ -70,9 +101,10 @@ p {
 }
 
 .card {
-    background: var(--color-bg-offset);
-    border-radius: var(--space-s);
-    margin: var(--space-m);
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow);
+    border-radius: var(--space-m);
+    margin: var(--space-l);
     max-width: 55ch;
     padding: var(--space-l);
     width: max-content;
