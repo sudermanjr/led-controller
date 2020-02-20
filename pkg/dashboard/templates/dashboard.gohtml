@@ -21,11 +21,17 @@
         <h1 class="card-heading">Demo</h1>
 
         <form action="/demo" method="post" id="demo">
-            <label for="demo-delay">Delay</label>
-            <input id="demo-delay" type="number" name="delay">
+            <label for="demo-count">Count</label>
+            <input id="demo-count" type="number" name="count" value="1" min="1" max="10">
+
+            <label for="demo-delay">Delay (in ms)</label>
+            <input id="demo-delay" type="number" name="delay" value="100" min="0" max="10000">
 
             <label for="demo-brightness">Brightness</label>
             <input id="demo-brightness" type="number" name="brightness">
+
+            <label for="demo-gradient-steps">Gradient Steps</label>
+            <input id="demo-gradient-steps" type="number" name="gradient-steps" value="2048" min="10" max="10000">
 
             <input type="submit" value="run" id="demo-submit">
         </form>
