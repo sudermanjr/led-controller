@@ -98,10 +98,10 @@ func (a *App) Initialize() {
 	})
 
 	// Display Info On Screen
-	// err := a.Screen.InfoDisplay()
-	// if err != nil {
-	// 	klog.Error(err)
-	// }
+	err := a.Screen.InfoDisplay()
+	if err != nil {
+		klog.Error(err)
+	}
 	a.Router = router
 }
 
