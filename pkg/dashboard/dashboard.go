@@ -14,6 +14,7 @@ import (
 	"github.com/sudermanjr/led-controller/pkg/color"
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
 	"github.com/sudermanjr/led-controller/pkg/screen"
+	"github.com/sudermanjr/led-controller/pkg/utils"
 )
 
 // App encapsulates all the config for the server
@@ -156,7 +157,7 @@ func (a *App) control(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.Array.Color = colorValue
-	a.Array.Brightness = int(brightness)
+	a.Array.Brightness = utils.ScaleBrightness(int(brightness), a.Array.MinBrightness, a.Array.MaxBrightness)
 	err = a.Array.Display(0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -182,7 +183,7 @@ func (a *App) demo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	a.Array.Brightness = int(brightness)
+	a.Array.Brightness = utils.ScaleBrightness(int(brightness), a.Array.MinBrightness, a.Array.MaxBrightness)
 	a.Array.Demo(1, int(delay), 1000)
 
 	http.Redirect(w, r, "/", 302)
