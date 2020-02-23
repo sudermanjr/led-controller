@@ -15,6 +15,7 @@ var (
 func main() {
 	pkger.Include("/pkg/dashboard/assets")
 	pkger.Include("/pkg/dashboard/templates")
+	pkger.Include("/pkg/screen/gifs")
 
 	cmd.Execute(version, commit)
 }

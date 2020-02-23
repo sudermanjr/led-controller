@@ -5,6 +5,7 @@ import (
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
+	"github.com/sudermanjr/led-controller/pkg/screen"
 )
 
 var (
@@ -16,6 +17,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(demoCmd)
+	rootCmd.AddCommand(screenDemoCmd)
 
 	demoCmd.Flags().IntVar(&demoDelay, "delay", 100, "The delay in ms of the demo program.")
 	demoCmd.Flags().IntVar(&demoCount, "count", 1, "The number of loops to run the demo.")
@@ -38,5 +40,22 @@ var demoCmd = &cobra.Command{
 
 		led.Brightness = demoBrightness
 		led.Demo(demoCount, demoDelay, demoGradientLength)
+	},
+}
+
+var screenDemoCmd = &cobra.Command{
+	Use:   "screen-demo",
+	Short: "Run a demo of the lcd screen.",
+	Long:  `Runs a demo of the lcd screen.`,
+	Run: func(cmd *cobra.Command, args []string) {
+
+		display, err := screen.NewDisplay()
+		if err != nil {
+			klog.Fatal(err)
+		}
+		err = display.Demo()
+		if err != nil {
+			klog.Fatal(err)
+		}
 	},
 }
