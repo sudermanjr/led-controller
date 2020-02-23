@@ -83,6 +83,10 @@ input {
     color: var(--color-light);
 }
 
+input[type="color"] {
+    padding: 0;
+}
+
 input[type="submit"] {
     align-items: center;
     background: var(--color-accent);
