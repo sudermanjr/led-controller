@@ -7,6 +7,7 @@ import (
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
+	"github.com/sudermanjr/led-controller/pkg/utils"
 )
 
 //Start starts the homekit server
@@ -62,7 +63,7 @@ func Start(homekitPin string, led *neopixel.LEDArray) {
 
 	ac.Lightbulb.Brightness.OnValueRemoteUpdate(func(value int) {
 		klog.Infof("homekit brightness set to: %d", value)
-		err = led.Fade(scaleHomekitBrightness(value, led.MinBrightness, led.MaxBrightness))
+		err = led.Fade(utils.ScaleBrightness(value, led.MinBrightness, led.MaxBrightness))
 		if err != nil {
 			klog.Error(err)
 		}
@@ -83,21 +84,6 @@ func Start(homekitPin string, led *neopixel.LEDArray) {
 	klog.Infof("fade-duration %d", led.FadeDuration)
 
 	t.Start()
-}
-
-// scaleHomekitBrightness converts a 0-100 homekit brightness
-// to the scale of the controller (min - max)
-// math isn't as easy as it used to be for me:
-// https://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
-func scaleHomekitBrightness(value int, minArray int, maxArray int) int {
-	min := 0
-	max := 100
-	a := minArray
-	b := maxArray
-
-	new := ((b-a)*(value-min))/(max-min) + a
-
-	return new
 }
 
 //modifySaturation changes the saturation and returns a new color

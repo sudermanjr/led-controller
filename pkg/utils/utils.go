@@ -85,3 +85,18 @@ func IPAddress() (string, error) {
 	}
 	return "", fmt.Errorf("Blank IP found")
 }
+
+// ScaleBrightness converts a 0-100 homekit brightness
+// to the scale of the controller (min - max)
+// math isn't as easy as it used to be for me:
+// https://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
+func ScaleBrightness(value int, minArray int, maxArray int) int {
+	min := 0
+	max := 100
+	a := minArray
+	b := maxArray
+
+	new := ((b-a)*(value-min))/(max-min) + a
+
+	return new
+}
