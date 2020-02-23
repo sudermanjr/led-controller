@@ -16,14 +16,16 @@ import (
 )
 
 var (
-	serverPort int
-	homekitPin string
+	serverPort     int
+	homekitPin     string
+	screenAttached bool
 )
 
 func init() {
 	rootCmd.AddCommand(dashboardCmd)
 	dashboardCmd.PersistentFlags().IntVarP(&serverPort, "port", "p", 8080, "The port to serve the dashboard on.")
 	dashboardCmd.PersistentFlags().StringVar(&homekitPin, "homekit-pin", "29847290", "The pin that homekit will use to authenticate with this device.")
+	dashboardCmd.PersistentFlags().BoolVar(&screenAttached, "screen", false, "Set to true if you have a screen attached.")
 }
 
 var dashboardCmd = &cobra.Command{
@@ -37,16 +39,19 @@ var dashboardCmd = &cobra.Command{
 			klog.Fatal(err)
 		}
 
-		display, err := screen.NewDisplay()
-		if err != nil {
-			klog.Fatal(err)
+		app := dashboard.App{
+			Array: led,
+			Port:  serverPort,
 		}
 
-		app := dashboard.App{
-			Array:  led,
-			Port:   serverPort,
-			Screen: display,
+		if screenAttached {
+			display, err := screen.NewDisplay()
+			if err != nil {
+				klog.Fatal(err)
+			}
+			app.Screen = display
 		}
+
 		app.Initialize()
 
 		go homekit.Start(homekitPin, led)

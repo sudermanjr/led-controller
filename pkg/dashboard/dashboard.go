@@ -97,11 +97,14 @@ func (a *App) Initialize() {
 		rootHandler(w, r)
 	})
 
-	// Display Info On Screen
-	err := a.Screen.InfoDisplay()
-	if err != nil {
-		klog.Error(err)
+	if a.Screen != nil {
+		// Display Info On Screen
+		err := a.Screen.InfoDisplay()
+		if err != nil {
+			klog.Error(err)
+		}
 	}
+
 	a.Router = router
 }
 
@@ -146,7 +149,7 @@ func (a *App) control(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	colorValue := color.HexToColor(color.ColorMap[r.Form["color"][0]])
+	colorValue := color.HexToColor(r.Form["color"][0])
 	brightness, err := strconv.ParseInt(r.Form["brightness"][0], 10, 32)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
