@@ -2,6 +2,10 @@
 
 This is a project to control NeoPixel lights with a PiZeroW and golang
 
+## Usage
+
+`led-controller help`
+
 ## Homekit
 
 `led-controller homekit` will start this as a homekit device. Check the help for options, specifically the homekit pin. The homekit device will work with color and brightness controls once registered.
