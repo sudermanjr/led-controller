@@ -2,44 +2,6 @@
 
 This is a project to control NeoPixel lights with a PiZeroW and golang
 
-## Usage
-
-```
-A cli for running neopixels
-
-Usage:
-  led-controller [flags]
-  led-controller [command]
-
-Available Commands:
-  dashboard   Run a dashboard
-  demo        Run a demo.
-  help        Help about any command
-  homekit     Run the lights as a homekit accessory.
-  off         Turn off the lights.
-  on          Turn on the lights.
-  version     Prints the current version of the tool.
-
-Flags:
-      --add_dir_header                   If true, adds the file directory to the header
-      --alsologtostderr                  log to standard error as well as files
-  -f, --fade-duration int                The duration of fade-ins and fade-outs in ms. [FADE_DURTION] (default 100)
-  -h, --help                             help for led-controller
-  -l, --led-count int                    The number of LEDs in the array. [LED_COUNT] (default 12)
-      --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
-      --log_dir string                   If non-empty, write log files in this directory
-      --log_file string                  If non-empty, use this log file
-      --log_file_max_size uint           Defines the maximum size a log file can grow to. Unit is megabytes. If the value is 0, the maximum file size is unlimited. (default 1800)
-      --logtostderr                      log to standard error instead of files (default true)
-      --max-brightness int               The maximum brightness that will work within the 0-250 range. [MAX_BRIGHTNESS] (default 200)
-      --min-brightness int               The minimum brightness that will work within the 0-250 range. [MIN_BRIGHTNESS] (default 25)
-      --skip_headers                     If true, avoid header prefixes in the log messages
-      --skip_log_headers                 If true, avoid headers when opening log files
-      --stderrthreshold severity         logs at or above this threshold go to stderr (default 2)
-  -v, --v Level                          number for the log level verbosity
-      --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
-```
-
 ## Homekit
 
 `led-controller homekit` will start this as a homekit device. Check the help for options, specifically the homekit pin. The homekit device will work with color and brightness controls once registered.
