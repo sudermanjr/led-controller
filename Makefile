@@ -14,8 +14,8 @@ LOCAL_TMP=$(PWD)/.tmp
 
 
 all: lint test create-builder build
-build: package create-builder build-local-arm
-build-circle: package create-builder build-circle-arm
+build: create-builder build-local-arm
+build-circle: create-builder build-circle-arm
 build-local-arm:
 	docker run --rm -ti -v ${GOPATH}:/go -v $(LOCAL_TMP):$(DOCKER_GOCACHE) -w $(PKG_PATH) rpi-ws281x-go-builder /usr/bin/qemu-arm-static /bin/sh -c "$(GOBUILD) -ldflags $(LDFLAGS) -o $(PKG_PATH)/$(BINARY_NAME) -v"
 	file led-controller
@@ -49,8 +49,6 @@ encrypt-init:
 	sops --encrypt pi-builder/init-decrypted > pi-builder/cloud-init.yaml
 decrypt-init:
 	sops -d pi-builder/cloud-init.yaml | yq r - data > pi-builder/init-decrypted
-package:
-	pkger
 styleguide:
 	stylemark -i pkg/dashboard/assets/css -o stylemark -c .stylemark.yml -w -b 8081
 run-dashboard:

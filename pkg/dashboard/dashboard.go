@@ -2,19 +2,27 @@ package dashboard
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"net/http"
 	"strconv"
 	"text/template"
 
 	"github.com/gorilla/mux"
-	"github.com/markbates/pkger"
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
 	"github.com/sudermanjr/led-controller/pkg/screen"
 	"github.com/sudermanjr/led-controller/pkg/utils"
+)
+
+var (
+	//go:embed templates/*
+	templates embed.FS
+
+	//go:embed assets/*
+	assets embed.FS
 )
 
 // App encapsulates all the config for the server
@@ -42,20 +50,12 @@ func getBaseTemplate() (*template.Template, error) {
 
 func parseTemplateFiles(tmpl *template.Template, templateFileNames []string) (*template.Template, error) {
 	for _, fname := range templateFileNames {
-		templateFile, err := pkger.Open("/pkg/dashboard/templates/" + fname)
+		templateFile, err := templates.ReadFile("templates/" + fname)
 		if err != nil {
 			return nil, err
 		}
-		defer templateFile.Close()
 
-		buf := new(bytes.Buffer)
-		_, err = buf.ReadFrom(templateFile)
-		if err != nil {
-			klog.Error(err)
-		}
-		s := buf.String()
-
-		tmpl, err = tmpl.Parse(string(s))
+		tmpl, err = tmpl.Parse(string(templateFile))
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +88,7 @@ func (a *App) Initialize() {
 	router.HandleFunc("/demo", a.demo).Methods("POST")
 
 	// HTML Dashboard
-	fileServer := http.FileServer(pkger.Dir("/pkg/dashboard/assets"))
+	fileServer := http.FileServer(http.FS(assets))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
