@@ -11,7 +11,7 @@ PKG_PATH=/go/src/github.com/sudermanjr/led-controller
 LDFLAGS=\"-X main.version=$(VERSION) -X main.commit=$(COMMIT) -s -w\"
 DOCKER_GOCACHE=/root/.cache/go-build
 BUILD_IMG=ws2811-builder:latest
-PLATFORM=linux/arm/v7
+PLATFORM=linux/arm/v6
 LOCAL_TMP=$(PWD)/.tmp
 
 all: lint test create-builder build
