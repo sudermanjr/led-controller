@@ -28,7 +28,7 @@ jobs:
       - run: make lint
       - run: make test
   build-arm:
-    executor: rok8s-scripts/ci-images
+    executor: cimg/go:1.17.3
     steps:
       - checkout
       - setup_remote_docker:
