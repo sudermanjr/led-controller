@@ -8,7 +8,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.0.3
 	github.com/markbates/pkger v0.14.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	github.com/rpi-ws281x/rpi-ws281x-go v1.0.5
+	github.com/rpi-ws281x/rpi-ws281x-go v1.0.8
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
@@ -26,7 +26,7 @@ require (
 	github.com/gosexy/to v0.0.0-20141221203644-c20e083e3123 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/miekg/dns v1.1.4 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tadglines/go-pkgs v0.0.0-20140924210655-1f86682992f1 // indirect
 	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4 // indirect

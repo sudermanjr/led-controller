@@ -1,13 +1,13 @@
 package screen
 
 import (
+	"embed"
 	"fmt"
 	"image"
 	"image/draw"
 	"image/gif"
 	"time"
 
-	"github.com/markbates/pkger"
 	"github.com/nfnt/resize"
 	"github.com/sudermanjr/led-controller/pkg/utils"
 	"golang.org/x/image/font"
@@ -19,6 +19,9 @@ import (
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 	"periph.io/x/periph/host"
 )
+
+//go:embed gifs/*
+var gifs embed.FS
 
 // Display is a screen that you can display info on
 type Display struct {
@@ -206,7 +209,7 @@ func convertAndResizeAndCenter(w, h int, src image.Image) *image.Gray {
 }
 
 func openGif(fileName string) (*gif.GIF, error) {
-	f, err := pkger.Open("/pkg/screen/gifs/" + fileName)
+	f, err := gifs.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
