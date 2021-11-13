@@ -18,9 +18,7 @@ references:
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.17-stretch
-        environment:
-          GO111MODULE: "on"
+      - image: cimg/go:1.17.3
     steps:
       - checkout
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
@@ -28,7 +26,8 @@ jobs:
       - run: make lint
       - run: make test
   build-arm:
-    executor: cimg/go:1.17.3
+    docker:
+      - image: cimg/go:1.17.3
     steps:
       - checkout
       - setup_remote_docker:
