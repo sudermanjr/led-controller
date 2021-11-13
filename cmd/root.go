@@ -41,8 +41,7 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 
 	klog.InitFlags(nil)
-	flag.Parse()
-	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	pflag.CommandLine.AddGoFlag(flag.CommandLine.Lookup("v"))
 
 	environmentVariables := map[string]string{
 		"LED_COUNT":      "led-count",
