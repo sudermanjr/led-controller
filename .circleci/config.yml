@@ -27,14 +27,14 @@ jobs:
       - run: go get github.com/gojp/goreportcard/cmd/goreportcard-cli
       - run: make lint
       - run: make test
-  build-pizero:
+  build-arm:
     executor: rok8s-scripts/ci-images
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.6
       - *enable_experimental_docker_features
-      - run: make build-local-arm
+      - run: make build
 
 workflows:
   version: 2
@@ -46,6 +46,12 @@ workflows:
               only: /.*/
             tags:
               ignore: /.*/
+      - build-arm:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /v.*/
       - rok8s-scripts/github_release:
           filters:
             branches:
