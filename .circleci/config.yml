@@ -56,7 +56,7 @@ workflows:
       - rok8s-scripts/github_release:
           requires:
             - test
-            - build
+            - build-arm
           filters:
             branches:
               ignore: /.*/
