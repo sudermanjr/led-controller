@@ -45,18 +45,9 @@ workflows:
               only: /.*/
             tags:
               only: /v.*/
-      - build-arm:
-          requires:
-            - test
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              only: /v.*/
       - rok8s-scripts/github_release:
           requires:
             - test
-            - build-arm
           filters:
             branches:
               ignore: /.*/
