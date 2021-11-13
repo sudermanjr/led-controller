@@ -1,12 +1,24 @@
 version: 2.1
 
 orbs:
-  rok8s-scripts: fairwinds/rok8s-scripts@10
+  rok8s-scripts: fairwinds/rok8s-scripts@11
+
+references:
+  enable_experimental_features: &enable_experimental_docker_features
+    run:
+      name: enable experimental features
+      command: |
+        set -ex
+        apk --update add openssh
+        ssh remote-docker \<<EOF
+          sudo bash -c 'echo "{\"experimental\": true}" > /etc/docker/daemon.json'
+          sudo systemctl restart docker
+        EOF
 
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.13-stretch
+      - image: circleci/golang:1.17-stretch
         environment:
           GO111MODULE: "on"
     steps:
@@ -19,8 +31,10 @@ jobs:
     executor: rok8s-scripts/ci-images
     steps:
       - checkout
-      - setup_remote_docker
-      - run: make build-circle
+      - setup_remote_docker:
+          version: 20.10.6
+      - *enable_experimental_docker_features
+      - run: make build-local-arm
 
 workflows:
   version: 2
