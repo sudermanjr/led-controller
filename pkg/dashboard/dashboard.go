@@ -21,7 +21,7 @@ var (
 	//go:embed templates/*
 	templates embed.FS
 
-	//go:embed assets/*
+	//go:embed assets
 	assets embed.FS
 )
 
