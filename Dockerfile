@@ -1,16 +1,26 @@
-FROM balenalib/raspberry-pi-golang:1.12-build AS builder
-RUN [ "cross-build-start" ]
-WORKDIR /tmp
-ENV GO111MODULE=on
-RUN apt-get update -y && apt-get install -y scons
-RUN git clone https://github.com/jgarff/rpi_ws281x.git && \
-  cd rpi_ws281x && \
-  scons
-RUN [ "cross-build-end" ]
+# Stage 0 : Build the C library
 
-FROM balenalib/raspberry-pi-golang:1.12
-RUN [ "cross-build-start" ]
-ENV GO111MODULE=on
-COPY --from=builder /tmp/rpi_ws281x/*.a /usr/local/lib/
-COPY --from=builder /tmp/rpi_ws281x/*.h /usr/local/include/
-RUN [ "cross-build-end" ]
+FROM debian:bullseye AS lib_builder
+
+WORKDIR /foundry
+
+RUN apt-get update -y && apt-get install -y \
+  build-essential \
+  cmake \
+  git
+
+RUN git clone https://github.com/jgarff/rpi_ws281x.git \
+  && cd rpi_ws281x \
+  && mkdir build \
+  && cd build \
+  && cmake -D BUILD_SHARED=OFF -D BUILD_TEST=OFF .. \
+  && cmake --build . \
+  && make install
+
+# Stage 1 : Build a go image with the rpi_ws281x C library and the go wrapper
+
+FROM golang:1.17
+COPY --from=lib_builder /usr/local/lib/libws2811.a /usr/local/lib/
+COPY --from=lib_builder /usr/local/include/ws2811 /usr/local/include/ws2811
+
+RUN go get github.com/rpi-ws281x/rpi-ws281x-go

@@ -1,26 +1,39 @@
 version: 2.1
 
 orbs:
-  rok8s-scripts: fairwinds/rok8s-scripts@10
+  rok8s-scripts: fairwinds/rok8s-scripts@11
+
+references:
+  enable_experimental_features: &enable_experimental_docker_features
+    run:
+      name: enable experimental features
+      command: |
+        set -ex
+        ssh remote-docker \<<EOF
+          sudo bash -c 'echo "{\"experimental\": true}" > /etc/docker/daemon.json'
+          sudo systemctl restart docker
+          sudo docker version
+        EOF
 
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.13-stretch
-        environment:
-          GO111MODULE: "on"
+      - image: cimg/go:1.17.3
     steps:
       - checkout
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run: go get github.com/gojp/goreportcard/cmd/goreportcard-cli
       - run: make lint
       - run: make test
-  build-pizero:
-    executor: rok8s-scripts/ci-images
+  build-arm:
+    docker:
+      - image: cimg/go:1.17.3
     steps:
       - checkout
-      - setup_remote_docker
-      - run: make build-circle
+      - setup_remote_docker:
+          version: 20.10.7
+      - *enable_experimental_docker_features
+      - run: make build
 
 workflows:
   version: 2
@@ -31,8 +44,10 @@ workflows:
             branches:
               only: /.*/
             tags:
-              ignore: /.*/
+              only: /v.*/
       - rok8s-scripts/github_release:
+          requires:
+            - test
           filters:
             branches:
               ignore: /.*/
