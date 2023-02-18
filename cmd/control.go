@@ -5,7 +5,6 @@ import (
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
-	"github.com/sudermanjr/led-controller/pkg/neopixel"
 	"github.com/sudermanjr/led-controller/pkg/screen"
 )
 
@@ -35,16 +34,12 @@ var onCmd = &cobra.Command{
 	Short: "Turn on the lights.",
 	Long:  `Turns on the lights to a specific color.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
+		defer app.Array.WS.Fini()
+		app.Array.Color = color.HexToColor(color.ColorMap[colorName])
+		app.Array.Brightness = onBrightness
+		err := app.Array.Display(0)
 		if err != nil {
-			klog.Fatal(err)
-		}
-		defer led.WS.Fini()
-		led.Color = color.HexToColor(color.ColorMap[colorName])
-		led.Brightness = onBrightness
-		err = led.Display(0)
-		if err != nil {
-			klog.Fatal(err)
+			app.Logger.Fatalw("failed to turn on lights", "error", err)
 		}
 	},
 }
@@ -54,14 +49,10 @@ var offCmd = &cobra.Command{
 	Short: "Turn off the lights.",
 	Long:  `Turns off the lights.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
+		defer app.Array.WS.Fini()
+		err := app.Array.SetMinBrightness()
 		if err != nil {
-			klog.Fatal(err)
-		}
-		defer led.WS.Fini()
-		err = led.SetMinBrightness()
-		if err != nil {
-			klog.Fatal(err)
+			app.Logger.Fatalw("failed to set brightness", "error", err)
 		}
 	},
 }
@@ -71,7 +62,6 @@ var displayText = &cobra.Command{
 	Short: "Display text.",
 	Long:  `Displays text at some coordinates on the LCD screen.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		display, err := screen.NewDisplay()
 		if err != nil {
 			klog.Fatal(err)

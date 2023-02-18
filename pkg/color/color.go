@@ -1,6 +1,7 @@
 package color
 
 import (
+	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
@@ -9,10 +10,9 @@ import (
 	"strings"
 
 	"github.com/lucasb-eyer/go-colorful"
-	"k8s.io/klog"
 )
 
-//ColorMap is a map of named colors to hex values
+// ColorMap is a map of named colors to hex values
 var ColorMap = map[string]string{
 	"blue":   "#0000ff",
 	"green":  "#00ff00",
@@ -54,8 +54,7 @@ func (gt GradientTable) GetInterpolatedColor(t float64) colorful.Color {
 func HexToColor(s string) colorful.Color {
 	c, err := colorful.Hex(s)
 	if err != nil {
-		klog.Errorf("error converting hex string to color: %v", err)
-		return colorful.Color{}
+		fmt.Println("error converting hex string to color", "error", err, "hex", s) // TODO - logging better
 	}
 	return c
 }
@@ -71,7 +70,7 @@ func ToUint32(color colorful.Color) uint32 {
 }
 
 // GradientPNG generates a gradient PNG as an example
-func GradientPNG(gradient GradientTable, h int, w int) {
+func GradientPNG(gradient GradientTable, h int, w int) error {
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
 
 	colorList := GradientColorList(gradient, h)
@@ -81,23 +80,23 @@ func GradientPNG(gradient GradientTable, h int, w int) {
 
 	outpng, err := os.Create("gradient.png")
 	if err != nil {
-		klog.Error("Error storing png: " + err.Error())
+		return fmt.Errorf("error storing png: %w", err)
 	}
 	defer outpng.Close()
 
 	err = png.Encode(outpng, img)
 	if err != nil {
-		klog.Error(err)
+		return err
 	}
+	return nil
 }
 
-//GradientColorList generates a list of colors for a GradientTable
+// GradientColorList generates a list of colors for a GradientTable
 // length: the number of colors you want
 func GradientColorList(gradient GradientTable, length int) []colorful.Color {
 	var list []colorful.Color
 	for j := 0; j < length; j++ {
 		c := gradient.GetInterpolatedColor(float64(j) / float64(length))
-		klog.V(10).Infof("color: %v", c)
 		list = append(list, c)
 	}
 	return list

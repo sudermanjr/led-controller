@@ -8,7 +8,6 @@ COMMIT := $(shell git rev-parse HEAD)
 VERSION=$(shell git describe --tags)
 HYPRIOT_IMAGE="https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.3.img.zip"
 PKG_PATH=/go/src/github.com/sudermanjr/led-controller
-LDFLAGS=\"-X main.version=$(VERSION) -X main.commit=$(COMMIT) -s -w\"
 DOCKER_GOCACHE=/root/.cache/go-build
 BUILD_IMG=ws2811-builder:latest
 PLATFORM=linux/arm/v6
@@ -17,7 +16,7 @@ LOCAL_TMP=$(PWD)/.tmp
 all: lint test create-builder build
 build: create-builder build-local-arm
 build-local-arm: create-builder
-	docker run --rm -v "${PWD}":$(PKG_PATH) --platform $(PLATFORM) -w "$(PKG_PATH)" $(BUILD_IMG) $(GOBUILD) -ldflags="$(LDFLAGS)"
+	docker run --rm -v "${PWD}":$(PKG_PATH) --platform $(PLATFORM) -w "$(PKG_PATH)" $(BUILD_IMG) $(GOBUILD) -ldflags="-X main.version=$(VERSION) -X main.commit=$(COMMIT) -s -w"
 build-osx:
 	$(GOBUILD)
 create-builder:

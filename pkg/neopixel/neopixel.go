@@ -5,7 +5,7 @@ import (
 
 	"github.com/lucasb-eyer/go-colorful"
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
-	"k8s.io/klog"
+	"go.uber.org/zap"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
 )
@@ -27,6 +27,8 @@ type LEDArray struct {
 	Brightness    int
 	Color         colorful.Color
 	FadeDuration  int
+
+	Logger *zap.SugaredLogger
 }
 
 var demoGradient = color.GradientTable{
@@ -44,16 +46,17 @@ var demoGradient = color.GradientTable{
 }
 
 // NewLEDArray creates a new array and initializes it
-func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration int) (*LEDArray, error) {
+func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration int, logger *zap.SugaredLogger) (*LEDArray, error) {
 	// Setup the LED lights
 	opt := ws2811.DefaultOptions
 	opt.Channels[0].Brightness = maxBrightness
 	opt.Channels[0].LedCount = ledCount
 	dev, err := ws2811.MakeWS2811(&opt)
 	if err != nil {
-		klog.Error(err)
 		return nil, err
 	}
+
+	whiteColor := color.HexToColor(color.ColorMap["white"])
 
 	led := &LEDArray{
 		WS:            dev,
@@ -61,13 +64,13 @@ func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration in
 		MinBrightness: minBrightness,
 		MaxBrightness: maxBrightness,
 		FadeDuration:  fadeDuration,
-		Color:         color.HexToColor(color.ColorMap["white"]),
+		Color:         whiteColor,
+		Logger:        logger,
 	}
 
 	err = dev.Init()
 	if err != nil {
-		klog.Error("could not initialize array, did you run as root?")
-		klog.Error(err)
+		led.Logger.Warnf("could not initialize array, did you run as root?")
 		return nil, err
 	}
 
@@ -78,16 +81,22 @@ func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration in
 // delay: sets the time between each LED coming on
 // brightness: sets the brightness for the entire thing
 func (led *LEDArray) Display(delay int) error {
-	klog.V(6).Infof("setting led array to color: %v, delay: %d, brightness: %d", led.Color, delay, led.Brightness)
+	led.Logger.Debugw("setting led array to color",
+		"color", led.Color,
+		"delay", delay,
+		"brightness", led.Brightness,
+	)
 	err := led.setBrightness()
 	if err != nil {
 		return err
 	}
 	for i := 0; i < len(led.WS.Leds(0)); i++ {
 		led.WS.Leds(0)[i] = color.ToUint32(led.Color)
-		klog.V(9).Infof("setting led %d to color: %v brightness: %d", i, led.Color, led.Brightness)
+		led.Logger.Debugw("setting led", "number", i,
+			"color", led.Color,
+			"brightness", led.Brightness,
+		)
 		if err := led.WS.Render(); err != nil {
-			klog.Error(err)
 			return err
 		}
 		time.Sleep(time.Duration(delay) * time.Millisecond)
@@ -100,7 +109,7 @@ func (led *LEDArray) Display(delay int) error {
 // if it goes out of bounds, it will be set to min or max
 func (led *LEDArray) setBrightness() error {
 	led.checkBrightness()
-	klog.V(10).Infof("setting brightness to %d", led.Brightness)
+	led.Logger.Debugw("setting brightness", "value", led.Brightness)
 	led.WS.SetBrightness(0, led.Brightness)
 	err := led.WS.Render()
 	if err != nil {
@@ -131,25 +140,25 @@ func (led *LEDArray) SetMinBrightness() error {
 // inside the min/max bounds. If it is out, fix it
 func (led *LEDArray) checkBrightness() {
 	// Check the bounds
-	klog.V(10).Infof("comparing value %d to min: %d, max: %d", led.Brightness, led.MinBrightness, led.MaxBrightness)
+	led.Logger.Debugw("comparing value to min/max", "value", led.Brightness, "min", led.MinBrightness, "max", led.MaxBrightness)
 	if led.Brightness < led.MinBrightness {
-		klog.V(8).Infof("brightness %d below bounds, setting to %d", led.Brightness, led.MinBrightness)
+		led.Logger.Debugw("brightness below min, setting to min", "value", led.Brightness, "min", led.MinBrightness)
 		led.Brightness = led.MinBrightness
 		return
 	}
 	if led.Brightness > led.MaxBrightness {
-		klog.V(8).Infof("brightness %d above bounds, setting to %d", led.Brightness, led.MaxBrightness)
+		led.Logger.Debugw("brightness above max, setting to max", "value", led.Brightness, "max", led.MaxBrightness)
 		led.Brightness = led.MaxBrightness
 		return
 	}
-	klog.V(8).Infof("not out of bounds. leaving it set as %d", led.Brightness)
+	led.Logger.Debugw("value is not out of min/max bounds", "value", led.Brightness)
 }
 
 // Fade goes to a new brightness in the duration specified
 func (led *LEDArray) Fade(target int) error {
-	klog.V(8).Infof("fading brightness to %d", target)
-	klog.V(8).Infof("setting color to %v", led.Color)
+	led.Logger.Debugw("fading led", "target", target, "color", led.Color)
 	ramp := stepRamp(float64(led.Brightness), float64(target), float64(led.FadeDuration))
+	led.Logger.Debugw("calculated ramp", "ramp", ramp)
 
 	//Set the color on all the LEDs
 	for i := 0; i < len(led.WS.Leds(0)); i++ {
@@ -157,7 +166,7 @@ func (led *LEDArray) Fade(target int) error {
 	}
 
 	for _, step := range ramp {
-		klog.V(10).Infof("processing step: %d", step)
+		led.Logger.Debugw("processing fade step", "step", step)
 		led.Brightness = step
 		err := led.setBrightness()
 		if err != nil {
@@ -171,23 +180,22 @@ func (led *LEDArray) Fade(target int) error {
 // stepRamp returns a list of steps in a brightness ramp up
 func stepRamp(start float64, stop float64, duration float64) []int {
 	slope := (stop - start) / duration
-	klog.V(7).Infof("slope of ramp: %f", slope)
 
 	var ramp []int
 	for i := 0; i < int(duration); i++ {
 		point := start + (slope * float64(i))
 		ramp = append(ramp, int(point))
 	}
-	klog.V(7).Infof("calculated ramp: %v", ramp)
 	return ramp
 }
 
-//Demo runs a demo of the LED capabilities
+// Demo runs a demo of the LED capabilities
 func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
 	for i := 0; i < (count); i++ {
 		for colorName, colorValue := range color.ColorMap {
-			klog.Infof("displaying: %s", colorName)
+			led.Logger.Debugw("diplaying color", "color", colorName)
 			led.Color = color.HexToColor(colorValue)
+
 			_ = led.Display(delay)
 		}
 		led.Color = color.HexToColor(color.ColorMap["black"])
@@ -195,7 +203,7 @@ func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
 		time.Sleep(500 * time.Millisecond)
 
 		// Second part of demo - go through a color gradient really fast.
-		klog.V(3).Infof("starting color gradient")
+		led.Logger.Infow("starting color gradient")
 		colorList := color.GradientColorList(demoGradient, gradientLength)
 		for _, gradColor := range colorList {
 			led.Color = gradColor

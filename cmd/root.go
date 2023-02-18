@@ -7,7 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"k8s.io/klog"
+	"github.com/sudermanjr/led-controller/pkg/neopixel"
+	"go.uber.org/zap"
 )
 
 var (
@@ -40,7 +41,8 @@ func init() {
 	//Commands
 	rootCmd.AddCommand(versionCmd)
 
-	klog.InitFlags(nil)
+	// initialize logging flags
+	logLevel = zap.LevelFlag("v", zap.InfoLevel, "log level")
 	pflag.CommandLine.AddGoFlag(flag.CommandLine.Lookup("v"))
 
 	environmentVariables := map[string]string{
@@ -56,7 +58,7 @@ func init() {
 		if value := os.Getenv(env); value != "" {
 			err := flag.Value.Set(value)
 			if err != nil {
-				klog.Errorf("Error setting flag %v to %s from environment variable %s", flag, value, env)
+				app.Logger.Errorw("Error setting flag from environment variable", "flag", flag, "value", value, "envVar", env)
 			}
 		}
 	}
@@ -66,11 +68,32 @@ var rootCmd = &cobra.Command{
 	Use:   "led-controller",
 	Short: "led-controller",
 	Long:  `A cli for running neopixels`,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		logConfig := &zap.Config{
+			Encoding:         "json",
+			EncoderConfig:    encoderConfig,
+			OutputPaths:      []string{"stdout"},
+			ErrorOutputPaths: []string{"stderr"},
+			Level:            zap.NewAtomicLevelAt(*logLevel),
+		}
+
+		l, err := logConfig.Build(zap.AddStacktrace(zap.DPanicLevel))
+		if err != nil {
+			return err
+		}
+		app.Logger = l.Sugar()
+
+		app.Array, err = neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration, app.Logger)
+		if err != nil {
+			return err
+		}
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		klog.Error("You must specify a sub-command.")
+		app.Logger.Errorw("you must specify a sub-command")
 		err := cmd.Help()
 		if err != nil {
-			klog.Error(err)
+			app.Logger.Errorw("error displaying help", "error", err)
 		}
 		os.Exit(1)
 	},
@@ -81,8 +104,7 @@ func Execute(VERSION string, COMMIT string) {
 	version = VERSION
 	commit = COMMIT
 	if err := rootCmd.Execute(); err != nil {
-		klog.Error(err)
-		os.Exit(1)
+		app.Logger.Fatalw("failed to execute cobra cmd", "error", err)
 	}
 }
 

@@ -2,9 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"k8s.io/klog"
 
-	"github.com/sudermanjr/led-controller/pkg/neopixel"
 	"github.com/sudermanjr/led-controller/pkg/screen"
 )
 
@@ -31,15 +29,10 @@ var demoCmd = &cobra.Command{
 	Long:  `Runs a demo.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// Initialize the LEDs
-		led, err := neopixel.NewLEDArray(minBrightness, maxBrightness, ledCount, fadeDuration)
-		if err != nil {
-			klog.Fatal(err)
-		}
-		defer led.WS.Fini()
+		defer app.Array.WS.Fini()
 
-		led.Brightness = demoBrightness
-		led.Demo(demoCount, demoDelay, demoGradientLength)
+		app.Array.Brightness = demoBrightness
+		app.Array.Demo(demoCount, demoDelay, demoGradientLength)
 	},
 }
 
@@ -51,11 +44,11 @@ var screenDemoCmd = &cobra.Command{
 
 		display, err := screen.NewDisplay()
 		if err != nil {
-			klog.Fatal(err)
+			app.Logger.Fatalw("failed to initialize display", "error", err)
 		}
 		err = display.Demo()
 		if err != nil {
-			klog.Fatal(err)
+			app.Logger.Fatalw("failed to run display demo", "error", err)
 		}
 	},
 }

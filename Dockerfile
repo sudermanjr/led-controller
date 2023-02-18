@@ -19,8 +19,6 @@ RUN git clone https://github.com/jgarff/rpi_ws281x.git \
 
 # Stage 1 : Build a go image with the rpi_ws281x C library and the go wrapper
 
-FROM golang:1.17
+FROM golang:1.19
 COPY --from=lib_builder /usr/local/lib/libws2811.a /usr/local/lib/
 COPY --from=lib_builder /usr/local/include/ws2811 /usr/local/include/ws2811
-
-RUN go get github.com/rpi-ws281x/rpi-ws281x-go

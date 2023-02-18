@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
@@ -32,6 +33,7 @@ type App struct {
 	Array     *neopixel.LEDArray
 	Screen    *screen.Display
 	ButtonPin int64
+	Logger    *zap.SugaredLogger
 }
 
 func getBaseTemplate() (*template.Template, error) {
