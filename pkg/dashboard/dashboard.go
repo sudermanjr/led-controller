@@ -27,10 +27,11 @@ var (
 
 // App encapsulates all the config for the server
 type App struct {
-	Router *mux.Router
-	Port   int
-	Array  *neopixel.LEDArray
-	Screen *screen.Display
+	Router    *mux.Router
+	Port      int
+	Array     *neopixel.LEDArray
+	Screen    *screen.Display
+	ButtonPin int64
 }
 
 func getBaseTemplate() (*template.Template, error) {
@@ -106,6 +107,8 @@ func (a *App) Initialize() {
 		}
 	}
 
+	a.ButtonPin = 4
+
 	a.Router = router
 }
 
@@ -113,6 +116,7 @@ func (a *App) Initialize() {
 func (a *App) Run() {
 	http.Handle("/", a.Router)
 	klog.Infof("Starting dashboard server on port %d", a.Port)
+	go a.WatchButton()
 	defer a.Array.WS.Fini()
 	klog.Fatalf("%v", http.ListenAndServe(fmt.Sprintf(":%d", a.Port), nil))
 }
