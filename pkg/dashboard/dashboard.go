@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"text/template"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
@@ -27,7 +27,7 @@ var (
 
 // App encapsulates all the config for the server
 type App struct {
-	Router    *mux.Router
+	Router    *chi.Mux
 	Port      int
 	Array     *neopixel.LEDArray
 	Screen    *screen.Display
@@ -82,17 +82,16 @@ func (a *App) writeTemplate(tmpl *template.Template, data string, w http.Respons
 
 // Initialize sets up an instance of App
 func (a *App) Initialize() {
-	router := mux.NewRouter()
-	router.NotFoundHandler = a.handle404()
+	router := chi.NewRouter()
 
 	//API
-	router.HandleFunc("/health", a.health).Methods("GET")
-	router.HandleFunc("/control", a.control).Methods("POST")
-	router.HandleFunc("/demo", a.demo).Methods("POST")
+	router.Get("/health", a.health)
+	router.Post("/control", a.control)
+	router.Post("/demo", a.demo)
 
 	// HTML Dashboard
 	fileServer := http.FileServer(http.FS(assets))
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
+	router.Handle("/static/*", fileServer)
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -116,21 +115,12 @@ func (a *App) Initialize() {
 
 // Run starts the http server
 func (a *App) Run() {
-	http.Handle("/", a.Router)
 	a.Logger.Infow("starting server", "port", a.Port)
 	go a.WatchButton()
 	defer a.Array.WS.Fini()
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", a.Port), nil); err != nil {
 		a.Logger.Fatalw("failed to start server", "error", err)
 	}
-}
-
-// Handle404 handles the not found error and logs it
-func (a *App) handle404() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		a.Logger.Warnw("serving 404", "request", r)
-		http.Error(w, "Not Found", http.StatusNotFound)
-	})
 }
 
 // rootHandler gets template data and renders the dashboard with it.

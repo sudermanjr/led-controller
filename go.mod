@@ -25,6 +25,7 @@ require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
 	github.com/brutella/dnssd v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-chi/chi/v5 v5.0.8 // indirect
 	github.com/gosexy/to v0.0.0-20141221203644-c20e083e3123 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/miekg/dns v1.1.4 // indirect
