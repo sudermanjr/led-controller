@@ -31,7 +31,7 @@ var dashboardCmd = &cobra.Command{
 	Long:  `Run a dashboard`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if screenAttached {
-			display, err := screen.NewDisplay()
+			display, err := screen.NewDisplay(app.Logger)
 			if err != nil {
 				app.Logger.Fatalw("failed to initialize screen", "error", err)
 			}
@@ -39,7 +39,7 @@ var dashboardCmd = &cobra.Command{
 		}
 
 		app.Initialize()
-		go homekit.Start(homekitPin, app.Array)
+		go homekit.Start(homekitPin, app.Array, app.Logger)
 		go app.Run()
 
 		// create a channel to respond to signals

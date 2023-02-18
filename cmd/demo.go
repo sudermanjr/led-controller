@@ -42,7 +42,7 @@ var screenDemoCmd = &cobra.Command{
 	Long:  `Runs a demo of the lcd screen.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		display, err := screen.NewDisplay()
+		display, err := screen.NewDisplay(app.Logger)
 		if err != nil {
 			app.Logger.Fatalw("failed to initialize display", "error", err)
 		}

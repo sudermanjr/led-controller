@@ -10,7 +10,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
-	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
 	"github.com/sudermanjr/led-controller/pkg/neopixel"
@@ -66,24 +65,25 @@ func parseTemplateFiles(tmpl *template.Template, templateFileNames []string) (*t
 	return tmpl, nil
 }
 
-func writeTemplate(tmpl *template.Template, data string, w http.ResponseWriter) {
+func (a *App) writeTemplate(tmpl *template.Template, data string, w http.ResponseWriter) {
 	buf := &bytes.Buffer{}
 	err := tmpl.Execute(buf, data)
 	if err != nil {
-		klog.Errorf("Error executing template: %v", err)
+		a.Logger.Errorw("error executing template", "error", err)
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	_, err = buf.WriteTo(w)
 	if err != nil {
-		klog.Errorf("Error writing template: %v", err)
+		a.Logger.Errorw("error writing template", "error", err)
 	}
 }
 
 // Initialize sets up an instance of App
 func (a *App) Initialize() {
 	router := mux.NewRouter()
-	router.NotFoundHandler = Handle404()
+	router.NotFoundHandler = a.handle404()
 
 	//API
 	router.HandleFunc("/health", a.health).Methods("GET")
@@ -98,14 +98,14 @@ func (a *App) Initialize() {
 			http.NotFound(w, r)
 			return
 		}
-		rootHandler(w, r)
+		a.rootHandler(w, r)
 	})
 
 	if a.Screen != nil {
 		// Display Info On Screen
 		err := a.Screen.InfoDisplay()
 		if err != nil {
-			klog.Error(err)
+			a.Logger.Errorw("error displaying screen", "error", err)
 		}
 	}
 
@@ -117,37 +117,39 @@ func (a *App) Initialize() {
 // Run starts the http server
 func (a *App) Run() {
 	http.Handle("/", a.Router)
-	klog.Infof("Starting dashboard server on port %d", a.Port)
+	a.Logger.Infow("starting server", "port", a.Port)
 	go a.WatchButton()
 	defer a.Array.WS.Fini()
-	klog.Fatalf("%v", http.ListenAndServe(fmt.Sprintf(":%d", a.Port), nil))
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", a.Port), nil); err != nil {
+		a.Logger.Fatalw("failed to start server", "error", err)
+	}
 }
 
 // Handle404 handles the not found error and logs it
-func Handle404() http.Handler {
+func (a *App) handle404() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		klog.V(8).Info(r)
+		a.Logger.Warnw("serving 404", "request", r)
 		http.Error(w, "Not Found", http.StatusNotFound)
 	})
 }
 
 // rootHandler gets template data and renders the dashboard with it.
-func rootHandler(w http.ResponseWriter, r *http.Request) {
+func (a *App) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := getBaseTemplate()
 	if err != nil {
-		klog.Errorf("Error getting template data %v", err)
+		a.Logger.Errorw("error getting template data", "error", err)
 		http.Error(w, "Error getting template data", 500)
 		return
 	}
-	writeTemplate(tmpl, "{}", w)
+	a.writeTemplate(tmpl, "{}", w)
 }
 
 // health is a healthcheck endpoint
 func (a *App) health(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("healthy"))
 	if err != nil {
-		klog.Errorf("Error writing healthcheck: %v", err)
+		a.Logger.Errorw("error writing healthcheck", "error", err)
 	}
 }
 
@@ -180,12 +182,12 @@ func (a *App) demo(w http.ResponseWriter, r *http.Request) {
 
 	delay, err := strconv.ParseInt(r.Form["delay"][0], 10, 32)
 	if err != nil {
-		klog.Errorf("error processing delay: %v", err)
+		a.Logger.Errorw("error processing delay", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	brightness, err := strconv.ParseInt(r.Form["brightness"][0], 10, 32)
 	if err != nil {
-		klog.Errorf("error processing brightness: %v", err)
+		a.Logger.Errorw("error processing brightness", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"k8s.io/klog"
 
 	"github.com/sudermanjr/led-controller/pkg/color"
 	"github.com/sudermanjr/led-controller/pkg/screen"
@@ -62,20 +61,20 @@ var displayText = &cobra.Command{
 	Short: "Display text.",
 	Long:  `Displays text at some coordinates on the LCD screen.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		display, err := screen.NewDisplay()
+		display, err := screen.NewDisplay(app.Logger)
 		if err != nil {
-			klog.Fatal(err)
+			app.Logger.Fatalw("could not init display", "error", err)
 		}
 
 		if scrollMessage {
 			err := display.ScrollText(displayTextX, displayTextY, displayMessage)
 			if err != nil {
-				klog.Fatal(err)
+				app.Logger.Fatalw("could not display scrolling message", "error", err, "scrollMessage", scrollMessage)
 			}
 		} else {
 			err := display.Text(displayTextX, displayTextY, displayMessage)
 			if err != nil {
-				klog.Fatal(err)
+				app.Logger.Fatalw("could not display text", "error", err, "displayMessage", displayMessage)
 			}
 		}
 	},

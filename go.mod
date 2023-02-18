@@ -13,7 +13,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1
-	k8s.io/klog v1.0.0
 	periph.io/x/periph v3.6.2+incompatible
 )
 

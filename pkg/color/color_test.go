@@ -113,7 +113,8 @@ func TestGradientPNG(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			GradientPNG(tt.gradient, tt.h, tt.w)
 			assert.FileExistsf(t, "gradient.png", "gradient.png should exist")
-			match := utils.DeepCompareFiles("gradient.png", "testdata/"+tt.testFile)
+			match, err := utils.DeepCompareFiles("gradient.png", "testdata/"+tt.testFile)
+			assert.NoError(t, err)
 			assert.Truef(t, match, "the files must match")
 		})
 		os.Remove("gradient.png")

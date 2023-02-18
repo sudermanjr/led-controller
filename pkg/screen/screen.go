@@ -10,10 +10,10 @@ import (
 
 	"github.com/nfnt/resize"
 	"github.com/sudermanjr/led-controller/pkg/utils"
+	"go.uber.org/zap"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/fixed"
-	"k8s.io/klog"
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/devices/ssd1306"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
@@ -26,20 +26,22 @@ var gifs embed.FS
 // Display is a screen that you can display info on
 type Display struct {
 	LCD *ssd1306.Dev
+
+	Logger *zap.SugaredLogger
 }
 
 // NewDisplay returns a *Display
-func NewDisplay() (*Display, error) {
+func NewDisplay(logger *zap.SugaredLogger) (*Display, error) {
 
 	// Make sure periph is initialized.
 	if _, err := host.Init(); err != nil {
-		klog.Fatal(err)
+		return nil, err
 	}
 
 	// Use i2creg I²C bus registry to find the first available I²C bus.
 	bus, err := i2creg.Open("")
 	if err != nil {
-		klog.Fatal(err)
+		return nil, err
 	}
 
 	opts := &ssd1306.Opts{
@@ -52,10 +54,10 @@ func NewDisplay() (*Display, error) {
 
 	dev, err := ssd1306.NewI2C(bus, opts)
 	if err != nil {
-		klog.Fatalf("failed to initialize ssd1306: %v", err)
+		return nil, err
 	}
 
-	obj := &Display{LCD: dev}
+	obj := &Display{LCD: dev, Logger: logger}
 	return obj, nil
 }
 
@@ -152,7 +154,7 @@ func (display *Display) ScrollText(x int, y int, message string) error {
 		scrollMax = display.LCD.Bounds().Max.Y
 	}
 
-	klog.V(7).Infof("scroll min: %d, max: %d", scrollMin, scrollMax)
+	display.Logger.Debugw("scroll bounds", "min", scrollMin, "max", scrollMax)
 	err = display.LCD.Scroll(ssd1306.Left, ssd1306.FrameRate5, scrollMin, scrollMax)
 	if err != nil {
 		return err
@@ -165,8 +167,7 @@ func (display *Display) stringImage(x int, y int, message string) *image1bit.Ver
 	f := basicfont.Face7x13
 	bounds := image.Rect(x, y, x+(display.LCD.Bounds().Dx()-x), y+f.Height)
 
-	klog.V(5).Infof("image bounds: %v", bounds)
-	klog.V(5).Infof("screen bounds: %v", display.LCD.Bounds())
+	display.Logger.Debugw("bounds", "image bounds", bounds, "screen bounds", display.LCD.Bounds())
 	img := image1bit.NewVerticalLSB(bounds)
 
 	drawer := font.Drawer{
@@ -183,7 +184,6 @@ func (display *Display) stringImage(x int, y int, message string) *image1bit.Ver
 func (display *Display) InfoDisplay() error {
 	ip, err := utils.IPAddress()
 	if err != nil {
-		klog.Error(err)
 		return err
 	}
 	err = display.Text(0, 0, fmt.Sprintf(" IP: %s", ip))
