@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
@@ -9,7 +8,7 @@ import (
 
 func (a *App) WatchButton() {
 	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
+		a.Logger.Errorw("could not init gpio", "error", err)
 		return
 	}
 	defer rpio.Close()
@@ -22,7 +21,7 @@ func (a *App) WatchButton() {
 
 	for {
 		if buttonPin.EdgeDetected() { // check if event occured
-			fmt.Println("button pressed")
+			a.Logger.Debugw("button pressed", "gpio", a.ButtonPin)
 		}
 		time.Sleep(time.Second / 2)
 	}
