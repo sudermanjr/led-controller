@@ -88,6 +88,7 @@ func (a *App) Initialize() {
 	router.Get("/health", a.health)
 	router.Post("/control", a.control)
 	router.Post("/demo", a.demo)
+	router.Get("/", a.rootHandler)
 
 	// HTML Dashboard
 	fileServer := http.FileServer(http.FS(assets))
