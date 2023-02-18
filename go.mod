@@ -1,6 +1,6 @@
 module github.com/sudermanjr/led-controller
 
-go 1.17
+go 1.19
 
 require (
 	github.com/brutella/hc v1.2.0
