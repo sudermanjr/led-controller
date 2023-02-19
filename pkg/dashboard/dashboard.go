@@ -84,15 +84,14 @@ func (a *App) writeTemplate(tmpl *template.Template, data string, w http.Respons
 // Initialize sets up an instance of App
 func (a *App) Initialize() {
 	a.Router = chi.NewRouter()
+	a.Router.Use(middleware.Recoverer)
+	a.Router.Use(LoggingMiddleware(a.Logger))
 
 	//API
 	a.Router.MethodFunc("GET", "/health", a.health)
 	a.Router.MethodFunc("POST", "/control", a.control)
 	a.Router.MethodFunc("POST", "/demo", a.demo)
 	a.Router.MethodFunc("GET", "/", a.rootHandler)
-
-	a.Router.Use(middleware.Recoverer)
-	a.Router.Use(LoggingMiddleware(a.Logger))
 
 	// HTML Dashboard
 	fileServer := http.FileServer(http.FS(assets))
