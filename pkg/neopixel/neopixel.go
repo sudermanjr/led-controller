@@ -86,7 +86,7 @@ func (led *LEDArray) Display(delay int) error {
 		"delay", delay,
 		"brightness", led.Brightness,
 	)
-	err := led.setBrightness()
+	err := led.SetBrightness()
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (led *LEDArray) Display(delay int) error {
 // setBrightness turns the LED array to a brightness value
 // and sets the led.brightness value accordingly
 // if it goes out of bounds, it will be set to min or max
-func (led *LEDArray) setBrightness() error {
+func (led *LEDArray) SetBrightness() error {
 	led.checkBrightness()
 	led.Logger.Debugw("setting brightness", "value", led.Brightness)
 	led.WS.SetBrightness(0, led.Brightness)
@@ -142,16 +142,13 @@ func (led *LEDArray) checkBrightness() {
 	// Check the bounds
 	led.Logger.Debugw("comparing value to min/max", "value", led.Brightness, "min", led.MinBrightness, "max", led.MaxBrightness)
 	if led.Brightness < led.MinBrightness {
-		led.Logger.Debugw("brightness below min, setting to min", "value", led.Brightness, "min", led.MinBrightness)
 		led.Brightness = led.MinBrightness
 		return
 	}
 	if led.Brightness > led.MaxBrightness {
-		led.Logger.Debugw("brightness above max, setting to max", "value", led.Brightness, "max", led.MaxBrightness)
 		led.Brightness = led.MaxBrightness
 		return
 	}
-	led.Logger.Debugw("value is not out of min/max bounds", "value", led.Brightness)
 }
 
 // Fade goes to a new brightness in the duration specified
@@ -166,9 +163,8 @@ func (led *LEDArray) Fade(target int) error {
 	}
 
 	for _, step := range ramp {
-		led.Logger.Debugw("processing fade step", "step", step)
 		led.Brightness = step
-		err := led.setBrightness()
+		err := led.SetBrightness()
 		if err != nil {
 			return err
 		}
@@ -218,9 +214,9 @@ func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
 func (led *LEDArray) FadeToggleOnOff() {
 	var err error
 	if led.Brightness == led.MinBrightness {
-		err = led.Fade(led.MaxBrightness)
+		err = led.SetMaxBrightness()
 	} else {
-		err = led.Fade(led.MinBrightness)
+		err = led.SetMinBrightness()
 	}
 	if err != nil {
 		led.Logger.Errorw("could not change brightness from button press", "error", err)
