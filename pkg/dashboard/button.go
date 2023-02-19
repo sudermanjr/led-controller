@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,5 +39,29 @@ func (a *App) WatchButton() {
 			res.Body.Close()
 		}
 		time.Sleep(time.Second / 2)
+	}
+}
+
+// buttonHandler is an HTTP web handler that the button press calls
+// this is done so that we can simulate a button press
+func (a *App) buttonHandler(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var data map[string]any
+	err := decoder.Decode(&data)
+	if err != nil {
+		a.Logger.Errorw("could not parse json response", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	a.Logger.Debugw("got json from button", "json", data)
+
+	a.Array.ToggleOnOff()
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("button press received"))
+	if err != nil {
+		a.Logger.Errorw("error responding to button press", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }

@@ -222,3 +222,17 @@ func (led *LEDArray) FadeToggleOnOff() {
 		led.Logger.Errorw("could not change brightness from button press", "error", err)
 	}
 }
+
+func (led *LEDArray) ToggleOnOff() {
+	var err error
+	if led.Brightness == led.MinBrightness {
+		led.Brightness = led.MaxBrightness
+		err = led.SetBrightness()
+	} else {
+		led.Brightness = led.MinBrightness
+		err = led.SetBrightness()
+	}
+	if err != nil {
+		led.Logger.Errorw("could not change brightness from button press", "error", err)
+	}
+}

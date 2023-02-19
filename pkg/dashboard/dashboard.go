@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"embed"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -237,27 +236,4 @@ func (a *App) demoHandler(w http.ResponseWriter, r *http.Request) {
 	a.Array.Demo(1, int(delay), 1000)
 
 	http.Redirect(w, r, "/", 302)
-}
-
-func (a *App) buttonHandler(w http.ResponseWriter, r *http.Request) {
-
-	decoder := json.NewDecoder(r.Body)
-	var data map[string]any
-	err := decoder.Decode(&data)
-	if err != nil {
-		a.Logger.Errorw("could not parse json response", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	a.Logger.Debugw("got json from button", "json", data)
-
-	a.Array.FadeToggleOnOff()
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("button press received"))
-	if err != nil {
-		a.Logger.Errorw("error responding to button press", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 }
