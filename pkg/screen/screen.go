@@ -14,10 +14,10 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/fixed"
-	"periph.io/x/periph/conn/i2c/i2creg"
-	"periph.io/x/periph/devices/ssd1306"
-	"periph.io/x/periph/devices/ssd1306/image1bit"
-	"periph.io/x/periph/host"
+	"periph.io/x/conn/v3/i2c/i2creg"
+	"periph.io/x/devices/v3/ssd1306"
+	"periph.io/x/devices/v3/ssd1306/image1bit"
+	"periph.io/x/host/v3"
 )
 
 //go:embed gifs/*
