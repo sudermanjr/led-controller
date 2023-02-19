@@ -2,11 +2,17 @@ package dashboard
 
 import (
 	"bytes"
+	"context"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"text/template"
+	"time"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -22,8 +28,8 @@ var (
 	//go:embed templates/*
 	templates embed.FS
 
-	//go:embed assets
-	assets embed.FS
+	//go:embed static
+	static embed.FS
 )
 
 // App encapsulates all the config for the server
@@ -88,14 +94,14 @@ func (a *App) Initialize() {
 	a.Router.Use(LoggingMiddleware(a.Logger))
 
 	//API
-	a.Router.MethodFunc("GET", "/health", a.health)
-	a.Router.MethodFunc("POST", "/control", a.control)
-	a.Router.MethodFunc("POST", "/demo", a.demo)
+	a.Router.MethodFunc("GET", "/health", a.healthHandler)
+	a.Router.MethodFunc("POST", "/control", a.controlHandler)
+	a.Router.MethodFunc("POST", "/demo", a.demoHandler)
+	a.Router.MethodFunc("POST", "/button", a.buttonHandler)
 	a.Router.MethodFunc("GET", "/", a.rootHandler)
 
-	// HTML Dashboard
-	fileServer := http.FileServer(http.FS(assets))
-	a.Router.Handle("/static/*", fileServer)
+	// Static Files
+	a.Router.Handle("/static/*", http.FileServer(http.FS(static)))
 
 	if a.Screen != nil {
 		// Display Info On Screen
@@ -108,19 +114,61 @@ func (a *App) Initialize() {
 	a.ButtonPin = 4 // TODO: this probably should be more dynamic
 }
 
-// Run starts the http server
-func (a *App) Run() {
+func (a *App) Run() error {
 	a.Logger.Infow("starting server", "port", a.Port)
 	go a.WatchButton()
 	defer a.Array.WS.Fini()
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", a.Port), nil); err != nil {
-		a.Logger.Fatalw("failed to start server", "error", err)
+
+	// https://github.com/go-chi/chi/blob/master/_examples/graceful/main.go
+	// The HTTP Server
+	server := &http.Server{
+		Addr:    fmt.Sprintf("0.0.0.0:%d", a.Port),
+		Handler: a.Router,
 	}
+
+	// Server run context
+	serverCtx, serverStopCtx := context.WithCancel(context.Background())
+
+	// Listen for syscall signals for process to interrupt/quit
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	go func() {
+		<-sig
+
+		// Shutdown signal with grace period of 30 seconds
+		shutdownCtx, cancel := context.WithTimeout(serverCtx, 30*time.Second)
+		defer cancel()
+
+		go func() {
+			<-shutdownCtx.Done()
+			if shutdownCtx.Err() == context.DeadlineExceeded {
+				a.Logger.Fatalw("graceful shutdown timed out.. forcing exit.")
+			}
+		}()
+
+		// Trigger graceful shutdown
+		err := server.Shutdown(shutdownCtx)
+		if err != nil {
+			a.Logger.Errorw("error shutting down", "error", err)
+			return
+		}
+		serverStopCtx()
+	}()
+
+	// Run the server
+	err := server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		return err
+	}
+
+	// Wait for server context to be stopped
+	<-serverCtx.Done()
+
+	return nil
 }
 
 // rootHandler gets template data and renders the dashboard with it.
 func (a *App) rootHandler(w http.ResponseWriter, r *http.Request) {
-
 	tmpl, err := getBaseTemplate()
 	if err != nil {
 		a.Logger.Errorw("error getting template data", "error", err)
@@ -131,22 +179,27 @@ func (a *App) rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // health is a healthcheck endpoint
-func (a *App) health(w http.ResponseWriter, r *http.Request) {
+func (a *App) healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("healthy"))
 	if err != nil {
 		a.Logger.Errorw("error writing healthcheck", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 
-func (a *App) control(w http.ResponseWriter, r *http.Request) {
+func (a *App) controlHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	colorValue := color.HexToColor(r.Form["color"][0])
 	brightness, err := strconv.ParseInt(r.Form["brightness"][0], 10, 32)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	a.Array.Color = colorValue
@@ -154,30 +207,57 @@ func (a *App) control(w http.ResponseWriter, r *http.Request) {
 	err = a.Array.Display(0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	http.Redirect(w, r, "/", 302)
 }
 
-func (a *App) demo(w http.ResponseWriter, r *http.Request) {
+func (a *App) demoHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	delay, err := strconv.ParseInt(r.Form["delay"][0], 10, 32)
 	if err != nil {
 		a.Logger.Errorw("error processing delay", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	brightness, err := strconv.ParseInt(r.Form["brightness"][0], 10, 32)
 	if err != nil {
 		a.Logger.Errorw("error processing brightness", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	a.Array.Brightness = utils.ScaleBrightness(int(brightness), a.Array.MinBrightness, a.Array.MaxBrightness)
 	a.Array.Demo(1, int(delay), 1000)
 
 	http.Redirect(w, r, "/", 302)
+}
+
+func (a *App) buttonHandler(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	var data map[string]any
+	err := decoder.Decode(&data)
+	if err != nil {
+		a.Logger.Errorw("could not parse json response", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	a.Logger.Debugw("got json from button", "json", data)
+
+	//TODO - handle the button press
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("button press received"))
+	if err != nil {
+		a.Logger.Errorw("error responding to button press", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
