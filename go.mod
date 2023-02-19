@@ -20,7 +20,10 @@ require (
 	go.uber.org/zap v1.24.0
 )
 
-require github.com/go-chi/chi/v5 v5.0.8
+require (
+	github.com/go-chi/chi v1.5.4
+	github.com/go-chi/chi/v5 v5.0.8
+)
 
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect

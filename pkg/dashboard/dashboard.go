@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
@@ -82,24 +83,20 @@ func (a *App) writeTemplate(tmpl *template.Template, data string, w http.Respons
 
 // Initialize sets up an instance of App
 func (a *App) Initialize() {
-	router := chi.NewRouter()
+	a.Router = chi.NewRouter()
 
 	//API
-	router.Get("/health", a.health)
-	router.Post("/control", a.control)
-	router.Post("/demo", a.demo)
-	router.Get("/", a.rootHandler)
+	a.Router.MethodFunc("GET", "/health", a.health)
+	a.Router.MethodFunc("POST", "/control", a.control)
+	a.Router.MethodFunc("POST", "/demo", a.demo)
+	a.Router.MethodFunc("GET", "/", a.rootHandler)
+
+	a.Router.Use(middleware.Recoverer)
+	a.Router.Use(LoggingMiddleware(a.Logger))
 
 	// HTML Dashboard
 	fileServer := http.FileServer(http.FS(assets))
-	router.Handle("/static/*", fileServer)
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		a.rootHandler(w, r)
-	})
+	a.Router.Handle("/static/*", fileServer)
 
 	if a.Screen != nil {
 		// Display Info On Screen
@@ -109,9 +106,7 @@ func (a *App) Initialize() {
 		}
 	}
 
-	a.ButtonPin = 4
-
-	a.Router = router
+	a.ButtonPin = 4 // TODO: this probably should be more dynamic
 }
 
 // Run starts the http server
