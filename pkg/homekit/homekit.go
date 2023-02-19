@@ -1,7 +1,7 @@
 package homekit
 
 import (
-	"github.com/brutella/hc"
+	"github.com/brutella/hc" // TODO: move to the brutella/hap library since this is deprecated
 	"github.com/brutella/hc/accessory"
 	"github.com/lucasb-eyer/go-colorful"
 	"go.uber.org/zap"
