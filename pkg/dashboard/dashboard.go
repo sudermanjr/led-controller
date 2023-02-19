@@ -251,15 +251,7 @@ func (a *App) buttonHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	a.Logger.Debugw("got json from button", "json", data)
 
-	var errFade error
-	if a.Array.Brightness == 0 {
-		errFade = a.Array.Fade(a.Array.MaxBrightness)
-	} else {
-		errFade = a.Array.Fade(a.Array.MinBrightness)
-	}
-	if errFade != nil {
-		a.Logger.Errorw("could not change brightness from button press", "error", err)
-	}
+	a.Array.FadeToggleOnOff()
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("button press received"))

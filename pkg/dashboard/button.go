@@ -28,7 +28,7 @@ func (a *App) WatchButton() {
 			a.Logger.Debugw("button pressed", "gpio", a.ButtonPin)
 			jsonStr := []byte(`{"button":"pressed"}`)
 
-			res, err := http.Post(fmt.Sprintf("http://localhost:%d", a.Port), "application/json", bytes.NewBuffer(jsonStr))
+			res, err := http.Post(fmt.Sprintf("http://localhost:%d/button", a.Port), "application/json", bytes.NewBuffer(jsonStr))
 			if err != nil {
 				a.Logger.Errorw("error making button request", "error", err)
 				continue

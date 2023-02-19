@@ -214,3 +214,15 @@ func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
 	_ = led.Fade(led.MinBrightness)
 
 }
+
+func (led *LEDArray) FadeToggleOnOff() {
+	var err error
+	if led.Brightness == led.MinBrightness {
+		err = led.Fade(led.MaxBrightness)
+	} else {
+		err = led.Fade(led.MinBrightness)
+	}
+	if err != nil {
+		led.Logger.Errorw("could not change brightness from button press", "error", err)
+	}
+}
