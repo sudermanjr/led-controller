@@ -29,7 +29,7 @@ func (a *App) WatchButton() {
 			a.Logger.Debugw("button pressed", "gpio", a.ButtonPin)
 			jsonStr := []byte(`{"button":"pressed"}`)
 
-			res, err := http.Post(fmt.Sprintf("http://localhost:%d/button", a.Port), "application/json", bytes.NewBuffer(jsonStr))
+			res, err := http.Post(fmt.Sprintf("http://localhost:%d/button/power", a.Port), "application/json", bytes.NewBuffer(jsonStr))
 			if err != nil {
 				a.Logger.Errorw("error making button request", "error", err)
 				continue
@@ -42,9 +42,9 @@ func (a *App) WatchButton() {
 	}
 }
 
-// buttonHandler is an HTTP web handler that the button press calls
-// this is done so that we can simulate a button press
-func (a *App) buttonHandler(w http.ResponseWriter, r *http.Request) {
+// powerButtonHandler is an HTTP web handler that the button press calls
+// this is so that we can simulate a button press and have a consolidated api
+func (a *App) powerButtonHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var data map[string]any
 	err := decoder.Decode(&data)

@@ -96,7 +96,7 @@ func (a *App) Initialize() {
 	a.Router.MethodFunc("GET", "/health", a.healthHandler)
 	a.Router.MethodFunc("POST", "/control", a.controlHandler)
 	a.Router.MethodFunc("POST", "/demo", a.demoHandler)
-	a.Router.MethodFunc("POST", "/button", a.buttonHandler)
+	a.Router.MethodFunc("POST", "/button/power", a.powerButtonHandler)
 	a.Router.MethodFunc("GET", "/", a.rootHandler)
 
 	// Static Files
