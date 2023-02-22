@@ -14,15 +14,16 @@ import (
 
 // ColorMap is a map of named colors to hex values
 var ColorMap = map[string]string{
-	"blue":   "#0000ff",
-	"green":  "#00ff00",
-	"yellow": "#ffaf33",
-	"purple": "#af33ff",
-	"red":    "#ff0000",
-	"teal":   "#33ffd1",
-	"pink":   "#ff08c7",
-	"white":  "#ffffff",
-	"black":  "#000000", // This basically equates to off.
+	"warmwhite": "#ffe9c2",
+	"blue":      "#0000ff",
+	"green":     "#00ff00",
+	"yellow":    "#ffaf33",
+	"purple":    "#af33ff",
+	"red":       "#ff0000",
+	"teal":      "#33ffd1",
+	"pink":      "#ff08c7",
+	"white":     "#ffffff",
+	"black":     "#000000", // This basically equates to off.
 }
 
 // GradientTable contains the "keypoints" of the colorgradient you want to generate.

@@ -56,15 +56,13 @@ func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration in
 		return nil, err
 	}
 
-	whiteColor := color.HexToColor(color.ColorMap["white"])
-
 	led := &LEDArray{
 		WS:            dev,
 		Brightness:    minBrightness,
 		MinBrightness: minBrightness,
 		MaxBrightness: maxBrightness,
 		FadeDuration:  fadeDuration,
-		Color:         whiteColor,
+		Color:         color.HexToColor(color.ColorMap["warmwhite"]),
 		Logger:        logger,
 	}
 
@@ -78,7 +76,7 @@ func NewLEDArray(minBrightness int, maxBrightness, ledCount int, fadeDuration in
 }
 
 // Display changes all of the LEDs one at a time
-// delay: sets the time between each LED coming on
+// delay: sets the time between each LED changing in milliseconds
 // brightness: sets the brightness for the entire thing
 func (led *LEDArray) Display(delay int) error {
 	led.Logger.Debugw("setting led array to color",
@@ -225,12 +223,13 @@ func (led *LEDArray) FadeToggleOnOff() {
 
 func (led *LEDArray) ToggleOnOff() {
 	var err error
+	led.Color = color.HexToColor(color.ColorMap["warmwhite"])
 	if led.Brightness == led.MinBrightness {
 		led.Brightness = led.MaxBrightness
-		err = led.SetBrightness()
+		err = led.Display(1)
 	} else {
 		led.Brightness = led.MinBrightness
-		err = led.SetBrightness()
+		err = led.Display(1)
 	}
 	if err != nil {
 		led.Logger.Errorw("could not change brightness from button press", "error", err)
