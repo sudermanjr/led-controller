@@ -231,9 +231,15 @@ func (a *App) demoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	steps, err := strconv.ParseInt(r.Form["gradient-steps"][0], 10, 32)
+	if err != nil {
+		a.Logger.Errorw("error processing gradient stpes", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	a.Array.Brightness = utils.ScaleBrightness(int(brightness), a.Array.MinBrightness, a.Array.MaxBrightness)
-	a.Array.Demo(1, int(delay), 1000)
+	a.Array.Demo(1, int(delay), int(steps))
 
 	http.Redirect(w, r, "/", 302)
 }

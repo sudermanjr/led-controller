@@ -201,8 +201,7 @@ func (led *LEDArray) Demo(count int, delay int, gradientLength int) {
 		colorList := color.GradientColorList(demoGradient, gradientLength)
 		for _, gradColor := range colorList {
 			led.Color = gradColor
-			_ = led.Display(0)
-			time.Sleep(time.Duration(delay) * time.Nanosecond)
+			_ = led.Display(delay / 10)
 		}
 	}
 	_ = led.Fade(led.MinBrightness)
