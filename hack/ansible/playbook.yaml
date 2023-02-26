@@ -33,12 +33,9 @@
         owner: root
         group: root
         mode: '0755'
-    - name: systemctl daemon-reload
-      become: true
-      ansible.builtin.systemd:
-        daemon_reload: true
     - name: systemctl start led-controller
       become: true
       ansible.builtin.systemd:
         name: led-controller
-        state: started
+        daemon_reload: true
+        state: restarted
