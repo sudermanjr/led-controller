@@ -10,6 +10,7 @@
           - curl
           - git
           - realvnc-vnc-server
+          - vim
         update_cache: yes
     - name: dist-upgrade
       become: true
