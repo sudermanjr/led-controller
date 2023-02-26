@@ -23,7 +23,7 @@
     - name: Download led-controller binary
       become: true
       ansible.builtin.get_url:
-        url: https://github.com/sudermanjr/led-controller/releases/download/v0.3.0/led-controller
+        url: https://github.com/sudermanjr/led-controller/releases/download/v0.3.1/led-controller
         dest: /usr/bin/led-controller
     - name: Setup a systemd service for the led-controller
       become: true
