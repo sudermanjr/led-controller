@@ -2,7 +2,7 @@
 Description=led-controller
 
 [Service]
-ExecStart=/usr/bin/led-controller --led-count {{ led_count }} dashboard -v=debug
+ExecStart=/usr/bin/led-controller --led-count {{ led_count }} dashboard -v=debug --homekit-pin {{ homekit_pin }}
 
 [Install]
 WantedBy=multi-user.target

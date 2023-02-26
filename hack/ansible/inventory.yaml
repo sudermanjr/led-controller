@@ -3,5 +3,6 @@ ledcontrollers:
     led_controller-2:
       ansible_host: led-controller-2.suderman.us.com
       led_count: 7
+      homekit_pin: 23455239
       screen: false
 
