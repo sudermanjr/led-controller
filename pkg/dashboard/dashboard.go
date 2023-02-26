@@ -110,7 +110,7 @@ func (a *App) Initialize() {
 		}
 	}
 
-	a.ButtonPin = 4 // TODO: this probably should be more dynamic
+	a.ButtonPin = 16 // TODO: this probably should be more dynamic
 }
 
 func (a *App) Run() error {
