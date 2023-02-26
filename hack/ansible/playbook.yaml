@@ -1,0 +1,43 @@
+- name: Install Controller
+  hosts: ledcontrollers
+  tasks:
+    - name: Ping
+      ansible.builtin.ping:
+    - name: Update repositories cache and install some packages
+      become: true
+      apt:
+        pkg:
+          - curl
+          - git
+          - realvnc-vnc-server
+        update_cache: yes
+    - name: dist-upgrade
+      become: true
+      apt:
+        upgrade: dist
+    - name: Remove useless packages from the cache
+      become: true
+      apt:
+        autoclean: yes
+    - name: Download led-controller binary
+      become: true
+      ansible.builtin.get_url:
+        url: https://github.com/sudermanjr/led-controller/releases/download/v0.3.0/led-controller
+        dest: /usr/bin/led-controller
+    - name: Setup a systemd service for the led-controller
+      become: true
+      ansible.builtin.template:
+        src: ./led-controller.service.jinja
+        dest: /etc/systemd/system/led-controller.service
+        owner: root
+        group: root
+        mode: '0755'
+    - name: systemctl daemon-reload
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+    - name: systemctl start led-controller
+      become: true
+      ansible.builtin.systemd:
+        name: led-controller
+        state: started

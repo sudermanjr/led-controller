@@ -1,0 +1,8 @@
+[Unit]
+Description=led-controller
+
+[Service]
+ExecStart=/usr/bin/led-controller --led-count {{ led_count }} dashboard -v=debug
+
+[Install]
+WantedBy=multi-user.target
