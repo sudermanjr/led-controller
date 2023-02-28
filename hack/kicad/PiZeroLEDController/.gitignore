@@ -1,0 +1,5 @@
+*.gbr
+*.gbrjob
+*.drl
+PiZeroLEDController-backups/*
+fp-info-cache
